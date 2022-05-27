@@ -41,5 +41,3 @@
         (get-in v [:body :hits :hits])
         (map #(doc-instance->Documentation %) v)
         ))
-
-(get-documentation!)
