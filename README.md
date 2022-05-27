@@ -6,6 +6,11 @@ API documentation search engine with microservice and K8S first approach.
 
 TBD
 
+## Installation
+
+1. Install FireFox Geckodriver: ```sudo apt-get install firefox-geckodriver```    
+2. Install ElasticSearch
+
 ## License
 
 MIT License
