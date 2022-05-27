@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Beholder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-light mb-5">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img src="/static/img/logo.png" alt="" height="24" class="d-inline-block align-text-top me-1">
+            Beholder
+        </a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+            <form class="d-flex" role="search">
+                <input class="form-control form-control-lg me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+
+            <ul class="navbar-nav float-end">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Config</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-2">
+            <div class="card">
+                <div class="card-body">
+                    <a href="https://www.easybill.de/api/" target="_blank"><h5 class="card-title">EasyBill</h5></a>
+                    Status: <span class="badge text-bg-success">OK</span><br/>
+                    Type: Swagger<br/>
+                    <small class="text-muted">Last updated 3 mins ago</small><br/><br/>
+                    <a href="https://www.easybill.de/api/" target="_blank" class="btn btn-primary">Open documentation</a>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+        crossorigin="anonymous"></script>
+</body>

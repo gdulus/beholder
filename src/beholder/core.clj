@@ -11,7 +11,7 @@
 
 (defroutes app-routes
            (route/resources "/static")
-           (GET "/" [] "test")
+           (GET "/" [] (tmpl/html "index.html"))
            (GET "/easybill" [] (crawler/get-content! "https://www.easybill.de/api/"))
            (GET "/api/v1/conf/documentations" [] (json-response {:data (r/get-documentation!)}))
            (GET "/*" [] (not-found "404")))
