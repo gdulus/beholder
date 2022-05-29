@@ -3,16 +3,33 @@
             [ring.util.http-response :refer :all]
             [compojure.route :as route]
             [beholder.template :as tmpl]
-            [beholder.crawler :as crawler]
+            [clojure.tools.logging :as log]
+            [beholder.bootstrap :as boot]
             [ring.middleware.defaults :refer [wrap-defaults]]
             [beholder.repository :as r]
             [ring.util.json-response :refer [json-response]]
             [qbits.spandex :as s]))
 
+(log/info "Initializing ElasticSearch with test data. Refresh page to see the results")
+(boot/init-elastic)
+
+; ---------------------------------------------------------------
+
+(defn- dashboard []
+  (ok (tmpl/html "index.html"
+                 {:docs (r/get-documentation!)})))
+
+; ---------------------------------------------------------------
+
 (defroutes app-routes
            (route/resources "/static")
-           (GET "/" [] (tmpl/html "index.html"))
-           (GET "/easybill" [] (crawler/get-content! "https://www.easybill.de/api/"))
+
+           ; ----------------- WEB
+           (GET "/" [] (dashboard))
+           (GET "/doc/:_/:id" [id] (str id))
+
+           ; ----------------- API
+
            (GET "/api/v1/conf/documentations" [] (json-response {:data (r/get-documentation!)}))
            (GET "/*" [] (not-found "404")))
 
@@ -23,24 +40,3 @@
                              :multipart  true
                              :nested     true
                              :keywordize true}})))
-
-
-
-
-;(def c (s/client {:hosts ["http://127.0.0.1:9200"]}))
-;(s/request c {:url [:_aliases]})
-
-; CREATE INDEXES
-;(s/request c {:url [:_aliases]})
-;(s/request c {:method :put :url [:config]})
-;(s/request c {:method :put :url [:docs]})
-
-; CREATE DATA
-;(s/request c {:method :delete :url [:instances]})
-;(s/request c {:method :delete :url [:docs]})
-
-;(try
-;  (s/request c {:method :post :url [:config :instances] :body {:name "EasyBill" :url "https://www.easybill.de/api/" :type "swagger"}})
-;  (catch Exception e
-;    println e
-;    ))

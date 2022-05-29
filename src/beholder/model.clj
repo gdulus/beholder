@@ -6,6 +6,9 @@
 (def ^:private doc-status (s/enum "updated" "new"))
 
 (s/defrecord Documentation [id :- (s/maybe s/Str)
+                            created :- (s/maybe s/Num)
+                            updated :- (s/maybe s/Num)
                             name :- s/Str
                             url :- doc-url
+                            status :- doc-status
                             type :- doc-type])

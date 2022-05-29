@@ -2,17 +2,18 @@
 
 app() {
   echo 'Starting beholder ...'
+  lein clean
   lein ring server
 }
 
 k8s() {
   echo 'Starting minikube ...'
-  minikube start --driver=docker --container-runtime=cri-o
+  minikube start --driver=docker
 }
 
 es() {
   echo 'Starting ES ...'
-  docker start elastic
+  docker start es01
 }
 
 "$@"

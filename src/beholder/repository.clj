@@ -9,10 +9,10 @@
 (def ^:private doc-instance-url [:config :doc-instance])
 
 (defn- doc-instance->Documentation [doc-instance]
-  (->> (:_source doc-instance)
-       (merge {:id (:_id doc-instance)})
-       (m/map->Documentation)
-       (s/validate Documentation)))
+  (as-> (:_source doc-instance) v
+        (merge v {:id (:_id doc-instance)})
+        (m/map->Documentation v)
+        (s/validate Documentation v)))
 
 ; ----------------------------------------------------------------
 
@@ -39,5 +39,4 @@
   (as-> (concat doc-instance-url [:_search]) v
         (e/request c {:url v})
         (get-in v [:body :hits :hits])
-        (map #(doc-instance->Documentation %) v)
-        ))
+        (map #(doc-instance->Documentation %) v)))

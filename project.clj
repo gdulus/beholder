@@ -17,6 +17,7 @@
                  [metosin/ring-http-response "0.9.3"]
                  [selmer "1.12.50"]
                  [environ "1.2.0"]
+                 [clj-soup/clojure-soup "0.1.3"]
                  ;; --------------- logging ------------------------------
                  [org.apache.logging.log4j/log4j-api "2.17.2"]
                  [org.apache.logging.log4j/log4j-core "2.17.2"]
