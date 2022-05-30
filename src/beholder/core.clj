@@ -3,6 +3,7 @@
             [ring.util.http-response :refer :all]
             [compojure.route :as route]
             [beholder.template :as tmpl]
+            [beholder.proxy :as proxy]
             [clojure.tools.logging :as log]
             [beholder.bootstrap :as boot]
             [ring.middleware.defaults :refer [wrap-defaults]]
@@ -11,26 +12,26 @@
             [qbits.spandex :as s]))
 
 (log/info "Initializing ElasticSearch with test data. Refresh page to see the results")
-(boot/init-elastic)
-
-; ---------------------------------------------------------------
-
-(defn- dashboard []
-  (ok (tmpl/html "index.html"
-                 {:docs (r/get-documentation!)})))
+; (boot/init-elastic)
 
 ; ---------------------------------------------------------------
 
 (defroutes app-routes
            (route/resources "/static")
 
-           ; ----------------- WEB
-           (GET "/" [] (dashboard))
-           (GET "/doc/:_/:id" [id] (str id))
+           (GET "/" []
+             (ok (tmpl/html "index.html" {:docs (r/list-documentation!)})))
 
-           ; ----------------- API
+           (GET "/doc/:id" [id]
+             (ok (tmpl/html "doc.html" {:doc {:id id}})))
 
-           (GET "/api/v1/conf/documentations" [] (json-response {:data (r/get-documentation!)}))
+           (GET "/proxy/:id" [id]
+             (ok (->> (r/get-documentation! id)
+                      (proxy/request-page!))))
+
+           (GET "/proxy/static/:encoded-url/:resource" [encoded-url resource]
+             (proxy/request-content! encoded-url resource))
+
            (GET "/*" [] (not-found "404")))
 
 (def app

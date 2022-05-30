@@ -35,8 +35,15 @@
         (s/validate Documentation v)
         (e/request c {:method :post :url doc-instance-url :body v})))
 
-(defn get-documentation! []
+(defn list-documentation! []
   (as-> (concat doc-instance-url [:_search]) v
         (e/request c {:url v})
         (get-in v [:body :hits :hits])
         (map #(doc-instance->Documentation %) v)))
+
+(defn get-documentation! [id]
+  (as-> (concat doc-instance-url [:_search]) v
+        (e/request c {:url v :body {:query {:terms {:_id [id]}}} })
+        (get-in v [:body :hits :hits])
+        (map #(doc-instance->Documentation %) v)
+        (first v)))
