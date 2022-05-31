@@ -12,3 +12,7 @@
                             url :- doc-url
                             status :- doc-status
                             type :- doc-type])
+
+(s/defrecord Render [name :- s/Str
+                     url :- doc-url
+                     content :- s/Str])

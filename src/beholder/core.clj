@@ -20,19 +20,27 @@
            (route/resources "/static")
 
            (GET "/" []
-             (ok (tmpl/html "index.html" {:docs (r/list-documentation!)})))
+             (ok (tmpl/html "dashboard.html"
+                            {:docs (r/list-documentation!)})))
 
            (GET "/doc/:id" [id]
-             (ok (tmpl/html "doc.html" {:doc {:id id}})))
+             (ok (tmpl/html "doc.html"
+                            {:doc {:id id}})))
 
-           (GET "/proxy/:id" [id]
-             (ok (->> (r/get-documentation! id)
-                      (proxy/request-page!))))
+           (GET "config" [id]
+             (ok (tmpl/html "doc.html"
+                            {:doc {:id id}})))
 
-           (GET "/proxy/static/:encoded-url/:resource" [encoded-url resource]
-             (proxy/request-content! encoded-url resource))
+           (context "/proxy" []
+             ;; Load page
+             (GET "/:id" [id]
+               (ok (->> (r/get-documentation! id)
+                        (proxy/request-page! "/proxy/static/"))))
+             ;; Load static resources
+             (GET "/static/:encoded-url/:resource" [encoded-url resource]
+               (proxy/request-content! encoded-url resource)))
 
-           (GET "/*" [] (not-found "404")))
+           (ANY "*" [] (not-found "404")))
 
 (def app
   (->

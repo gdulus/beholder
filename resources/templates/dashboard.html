@@ -1,0 +1,21 @@
+{% extends "templates/base.html" %}
+{% block body %}
+<div class="container-fluid mt-3">
+    <div class="row">
+        {% for doc in docs %}
+        <div class="col-2">
+            <div class="card">
+                <div class="card-body">
+                    <a href="{{doc.url}}" target="_blank"><h5 class="card-title">{{doc.name}}</h5></a>
+                    Status: <span class="badge text-bg-success">{{doc.status}}</span><br/>
+                    Type: {{doc.type}}<br/>
+                    <small class="text-muted">Last updated 3 mins ago</small><br/><br/>
+                    <a href="doc/{{doc.id}}" class="btn btn-primary">Open documentation</a>
+                </div>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
