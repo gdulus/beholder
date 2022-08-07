@@ -11,6 +11,20 @@ TBD
 1. Install FireFox Geckodriver: ```sudo apt-get install firefox-geckodriver```    
 2. Install ElasticSearch
 
+## Tasks
+
+```
+# DEPLOY IMAGE TO MINIKUBE AND EXPOSE IT
+eval $(minikube docker-env)  
+docker build -t openapi-app:1.0.0 .
+kubectl create deployment openapi-app --image=openapi-app:1.0.0
+kubectl expose deployment openapi-app --type=LoadBalancer --port=3000
+
+# CLEANUP
+docker rm openapi-app
+docker image rm openapi-app:1.0.0 
+```
+
 ## License
 
 MIT License
