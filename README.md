@@ -25,6 +25,14 @@ docker rm openapi-app
 docker image rm openapi-app:1.0.0 
 ```
 
+## Setting up minikube
+```
+kubectl apply -f ./infra/k8s/ClusterRole.yml
+kubectl create clusterrolebinding service-reader-pod \
+--clusterrole=service-reader  \
+--serviceaccount=default:default
+```
+
 ## License
 
 MIT License

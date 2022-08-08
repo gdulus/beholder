@@ -11,26 +11,25 @@
                  ;; -------------- persistence ---------------------------
                  [cc.qbits/spandex "0.7.10"]
                  ;; -------------- web -----------------------------------
-                 [etaoin "0.4.6"]
+                 [etaoin "1.0.38"]
                  [compojure "1.6.3"]
                  [ring/ring-defaults "0.3.3"]
                  [ring-json-response "0.2.0"]
                  [metosin/ring-http-response "0.9.3"]
-                 [selmer "1.12.52"]
+                 [selmer "1.12.53"]
                  [environ "1.2.0"]
                  [clj-soup/clojure-soup "0.1.3"]
                  [clj-http "3.12.3"]
                  [org.clojure/data.json "2.4.0"]
 
                  ;; --------------- logging ------------------------------
-                 [org.apache.logging.log4j/log4j-api "2.17.2"]
-                 [org.apache.logging.log4j/log4j-core "2.17.2"]
-                 [org.apache.logging.log4j/log4j-1.2-api "2.17.2"]
+                 [org.apache.logging.log4j/log4j-api "2.18.0"]
+                 [org.apache.logging.log4j/log4j-core "2.18.0"]
+                 [org.apache.logging.log4j/log4j-1.2-api "2.18.0"]
                  [org.clojure/tools.logging "1.2.4"]
                  ]
   :plugins [
-            ; make sure to change intellij repl run options to "run it with lein"
-            [lein-environ "1.2.0"]
+            [lein-environ "1.2.0"]                          ; make sure to change intellij repl run options to "run it with lein"
             [lein-ring "0.12.6"]
             [lein-eftest "0.5.9"]
             ]
