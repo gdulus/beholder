@@ -5,13 +5,13 @@
             [schema.core :as s])
   (:import (beholder.model K8SService)))
 
-(def ^:private k8s (k8s/client (env :k8s-apiserver)
-                               {:insecure? true}))
+(def ^:private k8s (delay (k8s/client (env :k8s-apiserver)
+                                      {:insecure? true})))
 
 (defn- load-list-resources []
-  (k8s/invoke k8s {:kind    :Service
-                   :action  :list
-                   :request {:namespace (env :k8s-namespaces)}}))
+  (k8s/invoke @k8s {:kind    :Service
+                    :action  :list
+                    :request {:namespace (env :k8s-namespaces)}}))
 
 (defn- callable-list-resource? [list-resource]
   (some? (get-in list-resource [:spec :selector :app])))
