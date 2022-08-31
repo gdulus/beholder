@@ -36,9 +36,8 @@
              (GET "/" [] (ok (tmpl/html "debug.html" {})))
              (POST "/" [code] (ok (tmpl/html "debug.html" (eval-code code)))))
 
-           ;(GET "/" []
-           ;  (ok (tmpl/html "dashboard.html"
-           ;                 {:docs (r/list-documentation!)})))
+           (GET "/" []
+             (ok (tmpl/html "dashboard.html")))
            ;
            ;(GET "/doc/:id" [id]
            ;  (ok (tmpl/html "doc.html"
