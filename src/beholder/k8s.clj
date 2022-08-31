@@ -8,15 +8,15 @@
 (def ^:private k8s (delay (k8s/client (env :k8s-apiserver)
                                       {:insecure? true})))
 
-(defn- load-list-resources []
+(defn- load-k8s-services []
   (k8s/invoke @k8s {:kind    :Service
                     :action  :list
                     :request {:namespace (env :k8s-namespaces)}}))
 
-(defn- callable-list-resource? [list-resource]
+(defn- https-callable-k8s-service? [list-resource]
   (some? (get-in list-resource [:spec :selector :app])))
 
-(defn- list-resource->K8SService [list-resource]
+(defn- k8s-services->K8SService [list-resource]
   (m/->K8SService
     (get-in list-resource [:metadata :name])
     (get-in list-resource [:metadata :namespace])
@@ -34,14 +34,11 @@
 
 (defn list-services []
   (->>
-    (load-list-resources)
+    (load-k8s-services)
     (:items)
-    (filter callable-list-resource?)
-    (map list-resource->K8SService)
+    (filter https-callable-k8s-service?)
+    (map k8s-services->K8SService)
     (map validate-K8SService)))
-
-
-
 
 
 
