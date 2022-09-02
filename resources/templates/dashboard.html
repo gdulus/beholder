@@ -6,13 +6,11 @@
         <div class="col-2">
             <div class="card">
                 <div class="card-body">
-                    <a href="{{doc.url}}" target="_blank"><h5 class="card-title">{{service.name}}</h5></a>
+                    <h5 class="card-title">{{service.name}}</h5>
                     Labels: <span class="badge text-bg-success">{{service.labels}}</span><br/>
                     Url: <span class="badge text-bg-success">{{service.url}}</span><br/>
-                    Port: <span class="badge text-bg-success">{{service.port}}</span><br/>
-                    Ip: <span class="badge text-bg-success">{{service.ip}}</span><br/>
                     <small class="text-muted">Last updated 3 mins ago</small><br/><br/>
-                    <a href="doc/{{doc.id}}" class="btn btn-primary">Open documentation</a>
+                    <a href="doc/swagger/{{service.id}}" class="btn btn-primary">Open documentation</a>
                 </div>
             </div>
 

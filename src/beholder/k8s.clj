@@ -24,6 +24,7 @@
 
 (defn- response->KubernetesService [list-resource]
   (m/->KubernetesService
+    (get-in list-resource [:metadata :uid])
     (get-in list-resource [:metadata :name])
     (get-in list-resource [:metadata :namespace])
     (str "http://" (get-in list-resource [:spec :selector :app]) ":" (get-port list-resource))
@@ -41,8 +42,14 @@
     (:items)
     (filter https-callable-k8s-service?)
     (map response->KubernetesService)
-    (map validate-KubernetesService)
-    ))
+    (map validate-KubernetesService)))
+
+(defn get-service! [id]
+  (->>
+    (list-services!)
+    (filter #(= id (:id %)))
+    (first)))
+
 
 
 

@@ -4,6 +4,7 @@
             [compojure.route :as route]
             [beholder.template :as tmpl]
             [beholder.k8s :as k8s]
+            [clj-http.client :as client]
     ;[beholder.proxy :as proxy]
             [clojure.tools.logging :as log]
     ;[beholder.bootstrap :as boot]
@@ -34,13 +35,19 @@
              (ok (tmpl/html "dashboard.html"
                             {:services (k8s/list-services!)})))
 
-           (GET "/swagger" []
-             (ok (tmpl/html "swagger-ui.html")))
+           (GET "/doc/swagger/:id" [id]
+             (ok (tmpl/html "swagger-ui.html"
+                            {:id id})))
+
+           (GET "/proxy/:id/swagger" [id]
+             (as->
+               (k8s/get-service! id) v
+               (str (:url v) "/static/api.json") v
+               (client/get v)))
 
            (context "/debug" []
              (GET "/" [] (ok (tmpl/html "debug.html" {})))
              (POST "/" [code] (ok (tmpl/html "debug.html" (eval-code code)))))
-
 
            ;
            ;(GET "/doc/:id" [id]

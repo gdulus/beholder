@@ -5,11 +5,14 @@
 <script src="/static/swagger/swagger-ui-bundle.js"></script>
 <script src="/static/swagger/swagger-ui-standalone-preset.js"></script>
 
+{{service}}
+
 <script>
 window.onload = function() {
   const ui = SwaggerUIBundle({
-    url: "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/examples/v3.0/petstore.json",
+    url: "/proxy/{{id}}/swagger",
     dom_id: '#swagger-ui',
+    supportedSubmitMethods: [],
     presets: [
       SwaggerUIBundle.presets.apis,
       SwaggerUIStandalonePreset
@@ -18,5 +21,6 @@ window.onload = function() {
 
   window.ui = ui
 }
+
 </script>
 {% endblock %}

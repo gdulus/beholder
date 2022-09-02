@@ -34,11 +34,11 @@
     (with-redefs [beholder.k8s/load-k8s-services (fn [] non-empty-response)]
       (let [response (list-services!)]
         (is (= 3 (count response)))
-        (is (= (m/map->KubernetesService {:name "beholder", :namespace "default", :url "http://beholder:3000", :labels {:app "beholder"}})
+        (is (= (m/map->KubernetesService {:id "c5553c2f-fd21-4b57-921a-a3ac66bf53b1" :name "beholder", :namespace "default", :url "http://beholder:3000", :labels {:app "beholder"}})
                (find-K8SService-by-name response "beholder")))
-        (is (= (m/map->KubernetesService {:name "hello-minikube", :namespace "default", :url "http://hello-minikube:8080", :labels {:app "hello-minikube"}})
+        (is (= (m/map->KubernetesService {:id "93ac81ac-3c25-4967-92ca-224251437fb8" :name "hello-minikube", :namespace "default", :url "http://hello-minikube:8080", :labels {:app "hello-minikube"}})
                (find-K8SService-by-name response "hello-minikube")))
-        (is (= (m/map->KubernetesService {:name "openapi-app", :namespace "default", :url "http://openapi-app:3000", :labels {:app "openapi-app"}})
+        (is (= (m/map->KubernetesService {:id "a57f9d9d-2db5-4323-a066-0fa8a8e633c4" :name "openapi-app", :namespace "default", :url "http://openapi-app:3000", :labels {:app "openapi-app"}})
                (find-K8SService-by-name response "openapi-app")))))))
 
 

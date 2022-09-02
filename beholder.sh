@@ -21,6 +21,7 @@ es() {
 
 build-docker() {
   lein clean
+  lein eftest
   lein ring uberjar
   docker build -t beholder:1.0.0 .
 }
