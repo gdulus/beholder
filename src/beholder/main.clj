@@ -1,8 +1,9 @@
-(ns beholder.core
+(ns beholder.main
   (:require [compojure.core :refer :all]
             [ring.util.http-response :refer :all]
             [compojure.route :as route]
             [beholder.template :as tmpl]
+            [beholder.k8s :as k8s]
     ;[beholder.proxy :as proxy]
             [clojure.tools.logging :as log]
     ;[beholder.bootstrap :as boot]
@@ -29,15 +30,18 @@
 (defroutes app-routes
            (route/resources "/static")
 
-           (GET "/debug" []
-             (ok (tmpl/html "debug.html" {})))
+           (GET "/" []
+             (ok (tmpl/html "dashboard.html"
+                            {:services (k8s/list-services!)})))
+
+           (GET "/swagger" []
+             (ok (tmpl/html "swagger-ui.html")))
 
            (context "/debug" []
              (GET "/" [] (ok (tmpl/html "debug.html" {})))
              (POST "/" [code] (ok (tmpl/html "debug.html" (eval-code code)))))
 
-           (GET "/" []
-             (ok (tmpl/html "dashboard.html")))
+
            ;
            ;(GET "/doc/:id" [id]
            ;  (ok (tmpl/html "doc.html"

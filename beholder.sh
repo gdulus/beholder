@@ -29,13 +29,6 @@ run-docker() {
   docker run --name beholder -p 3000:3000 beholder:1.0.0
 }
 
-deploy-mini() {
-  echo 'building docker image'
-  build-docker
-  echo 'deploy to minikube'
-  kubectl create deployment beholder --image=beholder:1.0.0
-}
-
 clean-up() {
   kubectl delete deployment beholder || true
   echo 'waiting to finish'
@@ -44,6 +37,14 @@ clean-up() {
   docker rm beholder || true
   docker image rm beholder:1.0.0 || true
   echo 'done'
+}
+
+deploy-mini() {
+  clean-up
+  echo 'building docker image'
+  build-docker
+  echo 'deploy to minikube'
+  kubectl create deployment beholder --image=beholder:1.0.0
 }
 
 help() {

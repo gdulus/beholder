@@ -1,6 +1,6 @@
 (ns beholder.k8s-test
   (:require [clojure.test :refer :all]
-            [beholder.k8s :refer [list-services]]
+            [beholder.k8s :refer [list-services!]]
             [beholder.model :as m]))
 
 (def empty-response {})
@@ -28,17 +28,17 @@
 
   (testing "Test list-services with empty response"
     (with-redefs [beholder.k8s/load-k8s-services (fn [] empty-response)]
-      (is (empty? (list-services)))))
+      (is (empty? (list-services!)))))
 
   (testing "Test list-services with non empty response"
     (with-redefs [beholder.k8s/load-k8s-services (fn [] non-empty-response)]
-      (let [response (list-services)]
+      (let [response (list-services!)]
         (is (= 3 (count response)))
-        (is (= (m/map->K8SService {:name "beholder", :namespace "default", :port 3000, :url "http://beholder"})
+        (is (= (m/map->KubernetesService {:name "beholder", :namespace "default", :url "http://beholder:3000", :labels {:app "beholder"}})
                (find-K8SService-by-name response "beholder")))
-        (is (= (m/map->K8SService {:name "hello-minikube", :namespace "default", :port 8080, :url "http://hello-minikube"})
+        (is (= (m/map->KubernetesService {:name "hello-minikube", :namespace "default", :url "http://hello-minikube:8080", :labels {:app "hello-minikube"}})
                (find-K8SService-by-name response "hello-minikube")))
-        (is (= (m/map->K8SService {:name "openapi-app", :namespace "default", :port 3000, :url "http://openapi-app"})
+        (is (= (m/map->KubernetesService {:name "openapi-app", :namespace "default", :url "http://openapi-app:3000", :labels {:app "openapi-app"}})
                (find-K8SService-by-name response "openapi-app")))))))
 
 

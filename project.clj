@@ -4,7 +4,8 @@
   :dependencies [
                  ;; -------------- base -----------------------------------
                  [org.clojure/clojure "1.11.1"]
-                 [prismatic/schema "1.2.1"]
+                 [prismatic/schema "1.4.0"]
+                 [jarohen/chime "0.3.3"]
                  ;; -------------- k8s -----------------------------------
                  [nubank/k8s-api "0.1.2"]
                  [io.fabric8/kubernetes-client "6.0.0"]
@@ -33,6 +34,6 @@
             [lein-ring "0.12.6"]
             [lein-eftest "0.5.9"]
             ]
-  :repl-options {:init-ns beholder.core}
-  :ring {:handler beholder.core/app
+  :repl-options {:init-ns beholder.main}
+  :ring {:handler beholder.main/app
          :nrepl   {:start? true :port 41111}})

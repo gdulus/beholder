@@ -1,0 +1,22 @@
+{% extends "templates/base.html" %}
+{% block body %}
+<div id="swagger-ui"></div>
+
+<script src="/static/swagger/swagger-ui-bundle.js"></script>
+<script src="/static/swagger/swagger-ui-standalone-preset.js"></script>
+
+<script>
+window.onload = function() {
+  const ui = SwaggerUIBundle({
+    url: "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/examples/v3.0/petstore.json",
+    dom_id: '#swagger-ui',
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIStandalonePreset
+    ]
+  })
+
+  window.ui = ui
+}
+</script>
+{% endblock %}
