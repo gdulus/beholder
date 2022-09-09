@@ -1,16 +1,15 @@
 (ns beholder.main
-  (:require [compojure.core :refer :all]
-            [ring.util.http-response :refer :all]
-            [compojure.route :as route]
+  (:require [beholder.k8s :as k8s]
             [beholder.template :as tmpl]
-            [beholder.k8s :as k8s]
             [clj-http.client :as client]
-    ;[beholder.proxy :as proxy]
             [clojure.tools.logging :as log]
-    ;[beholder.bootstrap :as boot]
+            [compojure.core :refer :all]
+            [compojure.route :as route]
+    ;[beholder.proxy :as proxy]
             [ring.middleware.defaults :refer [wrap-defaults]]
+    ;[beholder.bootstrap :as boot]
+            [ring.util.http-response :refer :all]
     ;[beholder.repository :as r]
-            [ring.util.json-response :refer [json-response]]
     ;[qbits.spandex :as s]
             ))
 
@@ -42,7 +41,8 @@
            (GET "/proxy/:id/swagger" [id]
              (as->
                (k8s/get-service! id) v
-               (str (:url v) "/static/api.json") v
+               (:url v)
+               (str v "/static/api.json") v
                (client/get v)))
 
            (context "/debug" []

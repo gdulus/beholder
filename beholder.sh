@@ -1,61 +1,90 @@
 #!/bin/bash
 
-app() {
+init() {
+  eval $(minikube docker-env) || true
+  newgrp docker
+}
+
+app-start() {
   echo 'Starting beholder ...'
   lein clean
   lein ring server
 }
 
-k8s() {
+es-run() {
+  echo 'Starting ES ...'
+  newgrp docker
+  docker start es01
+}
+
+docker-build() {
+  echo '-----------------------------------------------'
+  echo 'BUILDING DOCKER IMAGE'
+  lein clean
+  lein eftest
+  lein ring uberjar
+  docker build -t beholder:1.0.0 .
+  echo 'DONE'
+  echo '-----------------------------------------------'
+}
+
+docker-run() {
+  docker run --name beholder -p 3000:3000 beholder:1.0.0
+}
+
+docker-clean() {
+  echo '-----------------------------------------------'
+  echo 'CLEANING UP DOCKER'
+  docker rm beholder || true
+  docker image rm beholder:1.0.0 || true
+  echo 'DONE'
+  echo '-----------------------------------------------'
+}
+
+k8s-run() {
   echo 'Starting minikube ...'
   minikube start --driver=docker
   echo 'Starting proxy ...'
   kubectl proxy --port=8080 &
 }
 
-es() {
-  echo 'Starting ES ...'
-  newgrp docker
-  docker start es01
-}
-
-build-docker() {
-  lein clean
-  lein eftest
-  lein ring uberjar
-  docker build -t beholder:1.0.0 .
-}
-
-run-docker() {
-  docker run --name beholder -p 3000:3000 beholder:1.0.0
-}
-
-clean-up() {
+k8s-clean() {
+  echo '-----------------------------------------------'
+  echo 'CLEANING UP MINIKUBE'
   kubectl delete deployment beholder || true
-  echo 'waiting to finish'
-  sleep 3
-  echo 'cleaning up docker'
-  docker rm beholder || true
-  docker image rm beholder:1.0.0 || true
-  echo 'done'
+  echo 'DONE'
+  echo '-----------------------------------------------'
 }
 
-deploy-mini() {
-  clean-up
-  echo 'building docker image'
-  build-docker
-  echo 'deploy to minikube'
+k8s-deploy() {
+  echo '-----------------------------------------------'
+  echo 'DEPLOYING TO MINIKUBE'
+  k8s-clean
+  sleep 3
+  docker-clean
+  docker-build
   kubectl create deployment beholder --image=beholder:1.0.0
+  echo '==============================================='
+  echo 'Image build and deployed to minikube. You can access is under'
+  minikube service beholder --url
+  echo '==============================================='
+  echo 'DONE'
+  echo '-----------------------------------------------'
 }
 
 help() {
   echo '------------------------------------'
-  echo 'app = start the Beholder'
-  echo 'k8s = start the Minikube'
-  echo 'es = start ElasticSearch'
-  echo 'build-docker = builds docker image'
-  echo 'run-docker = runs created Docker image'
-  echo 'deploy-mini = deploye beholder image to minikube'
+  echo 'init = set up local env for development'
+  echo 'app-run = start the Beholder'
+  echo 'es-run = start ElasticSearch'
+  echo '------------------------------------'
+  echo 'docker-build = builds docker image'
+  echo 'docker-run = runs created Docker image'
+  echo 'docker-clean = cleans up Docker image of Beholder'
+  echo '------------------------------------'
+  echo 'k8s-run = start Minikube with Rest proxy'
+  echo 'k8s-deploy = cleans Minikube from Beholder, builds new image and deploys it again'
+  echo 'k8s-clean = cleans Minikube from Beholder'
   echo '------------------------------------'
 }
 
