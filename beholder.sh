@@ -1,10 +1,5 @@
 #!/bin/bash
 
-init() {
-  eval $(minikube docker-env) || true
-  newgrp docker
-}
-
 app-start() {
   echo 'Starting beholder ...'
   lein clean
@@ -74,7 +69,6 @@ k8s-deploy() {
 
 help() {
   echo '------------------------------------'
-  echo 'init = set up local env for development'
   echo 'app-run = start the Beholder'
   echo 'es-run = start ElasticSearch'
   echo '------------------------------------'
