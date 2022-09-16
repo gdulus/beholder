@@ -8,7 +8,7 @@
                  [jarohen/chime "0.3.3"]
                  ;; -------------- k8s -----------------------------------
                  [nubank/k8s-api "0.1.2"]
-                 [io.fabric8/kubernetes-client "6.0.0"]
+                 [io.fabric8/kubernetes-client "6.1.1"]
                  ;; -------------- persistence ---------------------------
                  [cc.qbits/spandex "0.7.10"]
                  ;; -------------- web -----------------------------------
@@ -17,7 +17,7 @@
                  [ring/ring-defaults "0.3.3"]
                  [ring-json-response "0.2.0"]
                  [metosin/ring-http-response "0.9.3"]
-                 [selmer "1.12.53"]
+                 [selmer "1.12.54"]
                  [environ "1.2.0"]
                  [clj-soup/clojure-soup "0.1.3"]
                  [clj-http "3.12.3"]

@@ -5,10 +5,11 @@
             [clojure.tools.logging :as log]
             [compojure.core :refer :all]
             [compojure.route :as route]
-    ;[beholder.proxy :as proxy]
             [ring.middleware.defaults :refer [wrap-defaults]]
-    ;[beholder.bootstrap :as boot]
             [ring.util.http-response :refer :all]
+            [schema.core :as s]
+    ;[beholder.proxy :as proxy]
+    ;[beholder.bootstrap :as boot]
     ;[beholder.repository :as r]
     ;[qbits.spandex :as s]
             ))
@@ -26,6 +27,7 @@
       {:result e
        :code   code}
       )))
+
 
 (defroutes app-routes
            (route/resources "/static")
@@ -45,17 +47,26 @@
                (str v "/static/api.json") v
                (client/get v)))
 
+           (context "/config" []
+             (GET "/" [] (ok (tmpl/html "config.html")))
+             (POST "/" [namespaces openApiLabel openApiPath]
+               (ok (tmpl/html "config.html" {
+                                             :namespaces   namespaces
+                                             :openApiLabel openApiLabel
+                                             :openApiPath  openApiPath
+                                             }))))
+
            (context "/debug" []
-             (GET "/" [] (ok (tmpl/html "debug.html" {})))
+             (GET "/" [] (ok (tmpl/html "debug.html")))
              (POST "/" [code] (ok (tmpl/html "debug.html" (eval-code code)))))
+
 
            ;
            ;(GET "/doc/:id" [id]
            ;  (ok (tmpl/html "doc.html"
            ;                 {:doc {:id id}})))
            ;
-           ;(GET "/config" []
-           ;  (ok (tmpl/html "config.html")))
+
            ;
            ;(context "/proxy" []
            ;  ;; Load page
