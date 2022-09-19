@@ -23,6 +23,9 @@
                  [clj-http "3.12.3"]
                  [org.clojure/data.json "2.4.0"]
 
+                 ;; --------------- testing ------------------------------
+                 [clj-test-containers "0.7.2"]
+
                  ;; --------------- logging ------------------------------
                  [org.apache.logging.log4j/log4j-api "2.18.0"]
                  [org.apache.logging.log4j/log4j-core "2.18.0"]

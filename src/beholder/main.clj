@@ -1,18 +1,14 @@
 (ns beholder.main
   (:require [beholder.k8s :as k8s]
+            [beholder.model :as m]
             [beholder.template :as tmpl]
             [clj-http.client :as client]
+            [clojure.string :refer [split]]
             [clojure.tools.logging :as log]
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults]]
-            [ring.util.http-response :refer :all]
-            [schema.core :as s]
-    ;[beholder.proxy :as proxy]
-    ;[beholder.bootstrap :as boot]
-    ;[beholder.repository :as r]
-    ;[qbits.spandex :as s]
-            ))
+            [ring.util.http-response :refer :all]))
 
 (log/info "Initializing ElasticSearch with test data. Refresh page to see the results")
 ; (boot/init-elastic)
@@ -50,6 +46,8 @@
            (context "/config" []
              (GET "/" [] (ok (tmpl/html "config.html")))
              (POST "/" [namespaces openApiLabel openApiPath]
+               (m/->BeholderConfig (split namespaces ",") openApiLabel, openApiPath)
+
                (ok (tmpl/html "config.html" {
                                              :namespaces   namespaces
                                              :openApiLabel openApiLabel
