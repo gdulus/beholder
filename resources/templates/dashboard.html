@@ -4,13 +4,17 @@
     <div class="row">
         {% for service in services %}
         <div class="col-2">
-            <div class="card">
-                <div class="card-body shadow-sm">
-                    <h5 class="card-title">{{service.name}}</h5>
-                    Labels: <span class="badge text-bg-success">{{service.labels}}</span><br/>
-                    Url: <span class="badge text-bg-success">{{service.url}}</span><br/>
-                    <small class="text-muted">Last updated 3 mins ago</small><br/><br/>
-                    <a href="doc/swagger/{{service.id}}" class="btn btn-primary">Open documentation</a>
+            <div class="card shadow-sm">
+                <h5 class="card-header clearfix">
+                    <span class="title">{{service.name}}</span>
+                    <a href="" class="float-end" title="edit"><i class="bi bi-tools"></i></a>
+                </h5>
+                <div class="card-body">
+                    <span class="badge text-bg-success">{{service.labels}}</span>
+                    <p class="card-text">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                    <a href="doc/swagger/{{service.id}}" class="btn btn-primary">REST doc</a>
+                    <a href="doc/swagger/{{service.id}}" class="btn btn-primary">ASYNC doc</a>
+                    <a href="doc/swagger/{{service.id}}" class="btn btn-primary">Repo</a>
                 </div>
             </div>
 
