@@ -14,7 +14,7 @@
                  ;; -------------- web -----------------------------------
                  [etaoin "1.0.38"]
                  [compojure "1.6.3"]
-                 [ring/ring-defaults "0.3.3"]
+                 [ring/ring-defaults "0.3.4"]
                  [ring-json-response "0.2.0"]
                  [metosin/ring-http-response "0.9.3"]
                  [selmer "1.12.54"]
@@ -37,6 +37,7 @@
             [lein-ring "0.12.6"]
             [lein-eftest "0.5.9"]
             ]
+  :aliases {"kaocha" ["with-profile" "+kaocha" "run" "-m" "kaocha.runner"]}
   :repl-options {:init-ns beholder.main}
   :ring {:handler beholder.main/app
          :nrepl   {:start? true :port 41111}})

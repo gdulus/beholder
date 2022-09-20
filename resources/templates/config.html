@@ -3,18 +3,28 @@
 <div class="container-fluid">
     <div class="row justify-content-md-center">
         <div class="col col-5">
+
+            {% if status = :success %}
+            <div class="alert alert-success mt-5" role="alert">
+                Configuration updated successfully.
+            </div>
+            {% endif %}
+
             <div class="card p-5 mt-5 shadow">
+
                 <form method="post" action="/config">
                     <div class="mb-3">
                         <label for="namespaces" class="form-label">Namespaces to scan</label>
-                        <input type="text" class="form-control" name="namespaces" id="namespaces" aria-describedby="namespacesHelp" value="{{namespaces}}">
+                        <input type="text" class="form-control" name="namespaces" id="namespaces"
+                               aria-describedby="namespacesHelp" value="{{data.namespaces|join:,}}">
                         <div id="namespacesHelp" class="form-text">List of coma separated namespaces to be search for
                             documentation. When empty "default" will be used.
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="openApiLabel" class="form-label">OpenAPI label</label>
-                        <input type="text" class="form-control" name="openApiLabel" id="openApiLabel" aria-describedby="openApiLabelHelp" value="{{openApiLabel}}">
+                        <input type="text" class="form-control" name="openApiLabel" id="openApiLabel"
+                               aria-describedby="openApiLabelHelp" value="{{data.openApiLabel}}">
                         <div id="openApiLabelHelp" class="form-text">Marker label identifying service as exposing
                             OpenAPI doc.
                             When empty "openapi" will be used.
@@ -22,7 +32,8 @@
                     </div>
                     <div class="mb-3">
                         <label for="openApiPath" class="form-label">OpenAPI doc default path</label>
-                        <input type="text" class="form-control" name="openApiPath" id="openApiPath" aria-describedby="openApiPathHelp" value="{{openApiPath}}">
+                        <input type="text" class="form-control" name="openApiPath" id="openApiPath"
+                               aria-describedby="openApiPathHelp" value="{{data.openApiPath}}">
                         <div id="openApiPathHelp" class="form-text">Path under which OpenAPI doc is exposed by
                             service.
                             When empty "/api/openapi.doc" will be used.

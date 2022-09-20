@@ -1,6 +1,7 @@
 (ns beholder.main
   (:require [beholder.k8s :as k8s]
             [beholder.model :as m]
+            [beholder.repository :as r]
             [beholder.template :as tmpl]
             [clj-http.client :as client]
             [clojure.string :refer [split]]
@@ -43,16 +44,22 @@
                (str v "/static/api.json") v
                (client/get v)))
 
-           (context "/config" []
-             (GET "/" [] (ok (tmpl/html "config.html")))
-             (POST "/" [namespaces openApiLabel openApiPath]
-               (m/->BeholderConfig (split namespaces ",") openApiLabel, openApiPath)
 
-               (ok (tmpl/html "config.html" {
-                                             :namespaces   namespaces
-                                             :openApiLabel openApiLabel
-                                             :openApiPath  openApiPath
-                                             }))))
+           (context "/config" []
+             (GET "/" []
+               (->>
+                 (r/get-config!)
+                 (assoc {} :data)
+                 (tmpl/html "config.html")
+                 (ok)))
+             (POST "/" [namespaces openApiLabel openApiPath]
+               (->>
+                 (m/->BeholderConfig (split namespaces #",") openApiLabel, openApiPath)
+                 (r/update-config!)
+                 (assoc {:status :success} :data)
+                 (tmpl/html "config.html")
+                 )))
+
 
            (context "/debug" []
              (GET "/" [] (ok (tmpl/html "debug.html")))
