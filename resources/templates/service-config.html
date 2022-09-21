@@ -1,0 +1,48 @@
+{% extends "templates/base.html" %}
+{% block body %}
+<div class="container-fluid">
+    <div class="row justify-content-md-center">
+        <div class="col col-5">
+
+            {% if status = :success %}
+            <div class="alert alert-success mt-5" role="alert">
+                Configuration updated successfully.
+            </div>
+            {% endif %}
+
+            <div class="card p-5 mt-5 shadow">
+                <h5>Configuration of <span class="text-success">{{service.name}}</span> service</h5>
+                <br/>
+                <form method="post" action="/service/{{service.id}}/config">
+                    <div class="mb-3">
+                        <label for="openApiPath" class="form-label">Service OpenAPI doc path</label>
+                        <input type="text" class="form-control" name="openApiPath" id="openApiPath"
+                               aria-describedby="openApiPathHelp" value="{{data.openApiPath}}">
+                        <div id="openApiPathHelp" class="form-text">
+                            Path under which OpenAPI doc is exposed by {{service.name}} service.
+                            When empty value from <a href="/config">global configuration</a> will be used.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="team" class="form-label">Team ownership</label>
+                        <input type="text" class="form-control" name="team" id="team"
+                               aria-describedby="teamHelp" value="{{data.team}}">
+                        <div id="teamHelp" class="form-text">
+                            Name of the team owning {{service.team}} service.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="repo" class="form-label">Repository link</label>
+                        <input type="text" class="form-control" name="repo" id="repo"
+                               aria-describedby="repoHelp" value="{{data.repo}}">
+                        <div id="repoHelp" class="form-text">
+                            Link to repository of {{service.repo}} service.
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

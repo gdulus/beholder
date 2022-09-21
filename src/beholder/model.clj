@@ -14,3 +14,9 @@
                              openApiLabel :- (s/maybe s/Str)
                              openApiPath :- (s/maybe s/Str)])
 
+
+(s/defrecord ServiceConfig [serviceId :- s/Str
+                            openApiPath :- (s/maybe s/Str)
+                            team :- (s/maybe s/Str)
+                            repo :- (s/maybe s/Str)])
+

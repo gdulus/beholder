@@ -26,34 +26,37 @@
       (testing "When update-config! executes successfully should return saved BeholderConfig"
         (is (some? (r/create-indexes!)))
         (is (= (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_1", "my/path/1")
-               (r/update-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_1", "my/path/1"))))
+               (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_1", "my/path/1"))))
         (is (some? (r/delete-indexes!))))
 
       (testing "When no BeholderConfig entries get-config! should return nil"
         (is (some? (r/create-indexes!)))
-        (is (nil? (r/get-config!)))
+        (is (nil? (r/get-beholder-config!)))
         (is (some? (r/delete-indexes!))))
 
       (testing "When one BeholderConfig entry get-config! should return it"
         (is (some? (r/create-indexes!)))
-        (is (some? (r/update-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_1", "my/path/1"))))
+        (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_1", "my/path/1"))))
         (Thread/sleep 1000)
         (is (= (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_1", "my/path/1")
-               (r/get-config!)))
+               (r/get-beholder-config!)))
         (is (some? (r/delete-indexes!))))
 
       (testing "When more than one BeholderConfig entries get-config! should return the latest one"
         (is (some? (r/create-indexes!)))
-        (is (some? (r/update-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_1", "my/path/1"))))
-        (is (some? (r/update-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_2", "my/path/2"))))
-        (is (some? (r/update-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_3", "my/path/3"))))
-        (is (some? (r/update-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_4", "my/path/4"))))
+        (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_1", "my/path/1"))))
+        (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_2", "my/path/2"))))
+        (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_3", "my/path/3"))))
+        (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_4", "my/path/4"))))
         (Thread/sleep 1000)
         (is (= (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_4", "my/path/4")
-               (r/get-config!)))
+               (r/get-beholder-config!)))
         (is (some? (r/delete-indexes!)))))
 
     (tc/stop! container)
     (tc/perform-cleanup!)))
 
 
+
+(deftest get-service-config-test
+  )

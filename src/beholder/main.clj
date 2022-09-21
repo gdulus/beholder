@@ -33,6 +33,43 @@
              (ok (tmpl/html "dashboard.html"
                             {:services (k8s/list-services!)})))
 
+           ;; ------------------------------------------------------------
+
+           (context "/service/:id" [id]
+             (GET "/config" []
+               (ok (tmpl/html "service-config.html"
+                              {:service (k8s/get-service! id)
+                               :data    (r/get-service-config id)})))
+
+             (POST "/config" [openApiPath team repo]
+               (->>
+                 (m/->ServiceConfig id openApiPath team repo)
+                 (r/save-service-config!)
+                 (assoc {:status :success :service (k8s/get-service! id)} :data)
+                 (tmpl/html "service-config.html"))))
+
+           ;; ------------------------------------------------------------
+
+           (context "/config" []
+             (GET "/" []
+               (->>
+                 (r/get-beholder-config!)
+                 (assoc {} :data)
+                 (tmpl/html "beholder-config.html")
+                 (ok)))
+             (POST "/" [namespaces openApiLabel openApiPath]
+               (->>
+                 (m/->BeholderConfig (split namespaces #",") openApiLabel, openApiPath)
+                 (r/save-beholder-config!)
+                 (assoc {:status :success} :data)
+                 (tmpl/html "beholder-config.html"))))
+
+           ;; ------------------------------------------------------------
+
+           (context "/debug" []
+             (GET "/" [] (ok (tmpl/html "debug.html")))
+             (POST "/" [code] (ok (tmpl/html "debug.html" (eval-code code)))))
+
            (GET "/doc/swagger/:id" [id]
              (ok (tmpl/html "swagger-ui.html"
                             {:id id})))
@@ -43,27 +80,6 @@
                (:url v)
                (str v "/static/api.json") v
                (client/get v)))
-
-
-           (context "/config" []
-             (GET "/" []
-               (->>
-                 (r/get-config!)
-                 (assoc {} :data)
-                 (tmpl/html "config.html")
-                 (ok)))
-             (POST "/" [namespaces openApiLabel openApiPath]
-               (->>
-                 (m/->BeholderConfig (split namespaces #",") openApiLabel, openApiPath)
-                 (r/update-config!)
-                 (assoc {:status :success} :data)
-                 (tmpl/html "config.html")
-                 )))
-
-
-           (context "/debug" []
-             (GET "/" [] (ok (tmpl/html "debug.html")))
-             (POST "/" [code] (ok (tmpl/html "debug.html" (eval-code code)))))
 
 
            ;
