@@ -1,7 +1,7 @@
 (ns beholder.k8s-test
-  (:require [clojure.test :refer :all]
-            [beholder.k8s :refer [list-services!]]
-            [beholder.model :as m]))
+  (:require [beholder.model :as m]
+            [beholder.repositories.k8s :refer [list-services!]]
+            [clojure.test :refer :all]))
 
 (def empty-response {})
 (def non-empty-response {:kind       "ServiceList",
@@ -27,11 +27,11 @@
 (deftest list-services-test
 
   (testing "Test list-services with empty response"
-    (with-redefs [beholder.k8s/load-k8s-services (fn [] empty-response)]
+    (with-redefs [beholder.repositories.k8s/load-k8s-services (fn [] empty-response)]
       (is (empty? (list-services!)))))
 
   (testing "Test list-services with non empty response"
-    (with-redefs [beholder.k8s/load-k8s-services (fn [] non-empty-response)]
+    (with-redefs [beholder.repositories.k8s/load-k8s-services (fn [] non-empty-response)]
       (let [response (list-services!)]
         (is (= 3 (count response)))
         (is (= (m/map->KubernetesService {:id "c5553c2f-fd21-4b57-921a-a3ac66bf53b1" :name "beholder", :namespace "default", :url "http://beholder:3000", :labels {:app "beholder"}})

@@ -1,6 +1,6 @@
 (ns beholder.indexer
   (:require [etaoin.api :as api]
-            [beholder.repository :as r]
+            [beholder.config :as r]
             [clojure.string :as s]
             [jsoup.soup :as jsoup]))
 

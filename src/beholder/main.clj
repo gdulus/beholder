@@ -1,7 +1,8 @@
 (ns beholder.main
-  (:require [beholder.k8s :as k8s]
-            [beholder.model :as m]
-            [beholder.repository :as r]
+  (:require [beholder.model :as m]
+            [beholder.repositories.config :as conf]
+            [beholder.repositories.k8s :as k8s]
+            [beholder.dashboard :as dashboard]
             [beholder.template :as tmpl]
             [clj-http.client :as client]
             [clojure.string :refer [split]]
@@ -31,7 +32,7 @@
 
            (GET "/" []
              (ok (tmpl/html "dashboard.html"
-                            {:services (k8s/list-services!)})))
+                            {:services (dashboard/list-services!)})))
 
            ;; ------------------------------------------------------------
 
@@ -39,30 +40,33 @@
              (GET "/config" []
                (ok (tmpl/html "service-config.html"
                               {:service (k8s/get-service! id)
-                               :data    (r/get-service-config id)})))
+                               :data    (conf/get-service-config id)})))
 
-             (POST "/config" [openApiPath team repo]
+             (POST "/config" [openApiPath team repo description]
                (->>
-                 (m/->ServiceConfig id openApiPath team repo)
-                 (r/save-service-config!)
+                 (m/->ServiceConfig id openApiPath team repo description)
+                 (conf/save-service-config!)
                  (assoc {:status :success :service (k8s/get-service! id)} :data)
-                 (tmpl/html "service-config.html"))))
+                 (tmpl/html "service-config.html")
+                 (ok))))
 
            ;; ------------------------------------------------------------
 
            (context "/config" []
              (GET "/" []
-               (->>
-                 (r/get-beholder-config!)
-                 (assoc {} :data)
-                 (tmpl/html "beholder-config.html")
-                 (ok)))
+               (as->
+                 (conf/get-beholder-config!) v
+                 (or v (m/map->BeholderConfig {:namespaces []}))
+                 {:data v}
+                 (tmpl/html "beholder-config.html" v)
+                 (ok v)))
              (POST "/" [namespaces openApiLabel openApiPath]
                (->>
                  (m/->BeholderConfig (split namespaces #",") openApiLabel, openApiPath)
-                 (r/save-beholder-config!)
+                 (conf/save-beholder-config!)
                  (assoc {:status :success} :data)
-                 (tmpl/html "beholder-config.html"))))
+                 (tmpl/html "beholder-config.html")
+                 (ok))))
 
            ;; ------------------------------------------------------------
 
@@ -100,10 +104,20 @@
 
            (ANY "*" [] (not-found "404")))
 
+
+(defn wrap-fallback-exception
+  [handler]
+  (fn [request]
+    (try
+      (handler request)
+      (catch Exception e
+        (internal-server-error (tmpl/html "errors/500.html" {:error e}))))))
+
 (def app
   (->
     app-routes
     (wrap-defaults {:params {:urlencoded true
                              :multipart  true
                              :nested     true
-                             :keywordize true}})))
+                             :keywordize true}})
+    wrap-fallback-exception))

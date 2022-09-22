@@ -1,4 +1,4 @@
-(ns beholder.repository
+(ns beholder.repositories.config
   (:require [beholder.model :as m]
             [qbits.spandex :as e]
             [schema.core :as s])
@@ -67,7 +67,16 @@
 ; ServiceConfig
 ; ----------------------------------------------------------------
 
-(defn get-service-config [id]
+(defn list-service-configs []
+  (as->
+    (e/request @c {:url [:services-config :_search]}) v
+    (get-in v [:body :hits :hits])
+    (map :_source v)
+    (map m/map->ServiceConfig v)
+    (map #(s/validate ServiceConfig %) v)))
+
+
+(defn  get-service-config [id]
   (get-by-id-and-validate [:services-config :_doc id]
                           ServiceConfig
                           m/map->ServiceConfig))

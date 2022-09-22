@@ -1,6 +1,5 @@
 (ns beholder.template
-  (:require [selmer.parser :as selmer]
-            [selmer.util :refer [without-escaping]]))
+  (:require [selmer.parser :as selmer]))
 
 (defn text
   ([file] (text file {}))
@@ -10,5 +9,4 @@
   ([file]
    (html file {}))
   ([file params]
-   (without-escaping
-     (selmer/render-file (str "templates/" file) params))))
+   (selmer/render-file (str "templates/" file) params)))

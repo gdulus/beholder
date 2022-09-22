@@ -28,7 +28,7 @@
                         <input type="text" class="form-control" name="team" id="team"
                                aria-describedby="teamHelp" value="{{data.team}}">
                         <div id="teamHelp" class="form-text">
-                            Name of the team owning {{service.name}} service.
+                            Name of the team owning {{service.team}} service.
                         </div>
                     </div>
                     <div class="mb-3">
@@ -36,15 +36,7 @@
                         <input type="text" class="form-control" name="repo" id="repo"
                                aria-describedby="repoHelp" value="{{data.repo}}">
                         <div id="repoHelp" class="form-text">
-                            Link to repository of {{service.name}} service.
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="repo" class="form-label">Short description</label>
-                        <textarea class="form-control" name="description" id="description"
-                                  aria-describedby="descriptionHelp" style="height:150px">{{data.description}}</textarea>
-                        <div id="descriptionHelp" class="form-text">
-                            Couple of worlds about {{service.name}} service
+                            Link to repository of {{service.repo}} service.
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Update</button>

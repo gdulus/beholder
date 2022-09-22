@@ -1,4 +1,4 @@
-(ns beholder.k8s
+(ns beholder.repositories.k8s
   (:require [kubernetes-api.core :as k8s]
             [environ.core :refer [env]]
             [beholder.model :as m]

@@ -1,6 +1,6 @@
 (ns beholder.repository-test
   (:require [beholder.model :as m]
-            [beholder.repository :as r]
+            [beholder.repositories.config :as r]
             [clj-test-containers.core :as tc]
             [clojure.test :refer :all]))
 
@@ -21,7 +21,7 @@
 
 (deftest ^:eftest/synchronized ^:integration update-config!-test
   (let [container (start-container)]
-    (with-redefs [beholder.repository/config (fn [] (build-mocked-es-config container))]
+    (with-redefs [beholder.repositories.config/config (fn [] (build-mocked-es-config container))]
 
       (testing "When update-config! executes successfully should return saved BeholderConfig"
         (is (some? (r/create-indexes!)))
@@ -56,7 +56,3 @@
     (tc/stop! container)
     (tc/perform-cleanup!)))
 
-
-
-(deftest get-service-config-test
-  )
