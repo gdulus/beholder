@@ -7,12 +7,6 @@
 
 ; --------------------------------------------------------------
 
-(defprotocol LabelConfigurationAware
-  (get-openapi-label [x]))
-
-
-; --------------------------------------------------------------
-
 (s/defrecord KubernetesService [id :- s/Str
                                 name :- s/Str
                                 namespace :- s/Str
@@ -20,6 +14,10 @@
                                 labels :- (s/maybe {s/Keyword s/Str})])
 
 ; --------------------------------------------------------------
+
+(defprotocol LabelConfigurationAware
+  (get-openapi-label [x]))
+
 
 (s/defrecord BeholderConfig [namespaces :- (s/maybe [s/Str])
                              openApiLabel :- (s/maybe s/Str)
