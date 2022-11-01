@@ -1,4 +1,4 @@
-(ns beholder.repository-test
+(ns beholder.repositories.config-test
   (:require [beholder.model :as m]
             [beholder.repositories.config :as r]
             [clj-test-containers.core :as tc]

@@ -8,15 +8,14 @@ app-start() {
 
 es-run() {
   echo 'Starting ES ...'
-  newgrp docker
-  docker start es01
+  docker start elasticsearch
 }
 
 docker-build() {
   echo '-----------------------------------------------'
   echo 'BUILDING DOCKER IMAGE'
   lein clean
-  lein eftest
+  #lein eftest
   lein ring uberjar
   docker build -t beholder:1.0.0 .
   echo 'DONE'
@@ -61,13 +60,23 @@ k8s-deploy() {
   kubectl create deployment beholder --image=beholder:1.0.0
   echo '==============================================='
   echo 'Image build and deployed to minikube. You can access is under'
+  sleep 3
   minikube service beholder --url
   echo '==============================================='
   echo 'DONE'
   echo '-----------------------------------------------'
 }
 
+init-dev-env() {
+  echo '-----------------------------------------------'
+  echo 'Starting dev env'
+  k8s-run
+  es-run
+}
+
 help() {
+  echo '------------------------------------'
+  echo 'init-dev-env = Start all components for dev env'
   echo '------------------------------------'
   echo 'app-run = start the Beholder'
   echo 'es-run = start ElasticSearch'

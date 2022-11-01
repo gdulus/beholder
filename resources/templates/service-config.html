@@ -24,6 +24,13 @@
                         </div>
                     </div>
                     <div class="mb-3">
+                        <label for="repo" class="form-label">OpenAPI file status</label>
+                        <div>
+                            <span class="badge text-bg-danger">File not found</span>
+                            <span class="badge text-bg-success">File found</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
                         <label for="team" class="form-label">Team ownership</label>
                         <input type="text" class="form-control" name="team" id="team"
                                aria-describedby="teamHelp" value="{{data.team}}">
@@ -42,11 +49,13 @@
                     <div class="mb-3">
                         <label for="repo" class="form-label">Short description</label>
                         <textarea class="form-control" name="description" id="description"
-                                  aria-describedby="descriptionHelp" style="height:150px">{{data.description}}</textarea>
+                                  aria-describedby="descriptionHelp"
+                                  style="height:150px">{{data.description}}</textarea>
                         <div id="descriptionHelp" class="form-text">
                             Couple of worlds about {{service.name}} service
                         </div>
                     </div>
+
                     <button type="submit" class="btn btn-primary">Update</button>
                 </form>
             </div>

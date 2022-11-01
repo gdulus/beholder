@@ -1,19 +1,17 @@
 (ns beholder.main
-  (:require [beholder.model :as m]
+  (:require [beholder.dashboard :as dashboard]
+            [beholder.model :as m]
             [beholder.repositories.config :as conf]
             [beholder.repositories.k8s :as k8s]
-            [beholder.dashboard :as dashboard]
             [beholder.template :as tmpl]
             [clj-http.client :as client]
             [clojure.string :refer [split]]
-            [clojure.tools.logging :as log]
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults]]
-            [ring.util.http-response :refer :all]))
+            [ring.util.http-response :refer :all]
+            [taoensso.timbre :refer [info error]]))
 
-(log/info "Initializing ElasticSearch with test data. Refresh page to see the results")
-; (boot/init-elastic)
 
 ; ---------------------------------------------------------------
 
@@ -105,13 +103,16 @@
            (ANY "*" [] (not-found "404")))
 
 
-(defn wrap-fallback-exception
-  [handler]
-  (fn [request]
-    (try
-      (handler request)
-      (catch Exception e
-        (internal-server-error (tmpl/html "errors/500.html" {:error e}))))))
+;(defn wrap-fallback-exception
+;  [handler]
+;  (fn [request]
+;    (try
+;      (handler request)
+;      (catch Exception e
+;        (error "Error while handling request" e)
+;        (internal-server-error (tmpl/html "errors/500.html" {:error e}))))))
+
+(info "Starting Beholder app")
 
 (def app
   (->
@@ -120,4 +121,5 @@
                              :multipart  true
                              :nested     true
                              :keywordize true}})
-    wrap-fallback-exception))
+    ;wrap-fallback-exception
+    ))

@@ -1,11 +1,18 @@
 (ns beholder.repositories.config
   (:require [beholder.model :as m]
+            [clojure.string :as str]
+            [environ.core :refer [env]]
             [qbits.spandex :as e]
-            [schema.core :as s])
+            [schema.core :as s]
+            [taoensso.timbre :refer [spy]])
   (:import (beholder.model BeholderConfig)
            (beholder.model ServiceConfig)))
 
-(defn config [] {:hosts ["http://127.0.0.1:9200"]})
+(defn config []
+  (spy :info
+       "Creating ElasticSearch connection to hosts"
+       {:hosts (str/split (env :es-hosts) #",")}))
+
 (def ^:private c (delay (e/client (config))))
 
 ; ----------------------------------------------------------------
@@ -76,7 +83,7 @@
     (map #(s/validate ServiceConfig %) v)))
 
 
-(defn  get-service-config [id]
+(defn get-service-config [id]
   (get-by-id-and-validate [:services-config :_doc id]
                           ServiceConfig
                           m/map->ServiceConfig))

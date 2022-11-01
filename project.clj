@@ -17,7 +17,7 @@
                  [ring/ring-defaults "0.3.4"]
                  [ring-json-response "0.2.0"]
                  [metosin/ring-http-response "0.9.3"]
-                 [selmer "1.12.54"]
+                 [selmer "1.12.55"]
                  [environ "1.2.0"]
                  [clj-soup/clojure-soup "0.1.3"]
                  [clj-http "3.12.3"]
@@ -27,16 +27,14 @@
                  [clj-test-containers "0.7.2"]
 
                  ;; --------------- logging ------------------------------
-                 [org.apache.logging.log4j/log4j-api "2.18.0"]
-                 [org.apache.logging.log4j/log4j-core "2.18.0"]
-                 [org.apache.logging.log4j/log4j-1.2-api "2.18.0"]
-                 [org.clojure/tools.logging "1.2.4"]
+                 [com.taoensso/timbre "5.2.1"]
                  ]
   :plugins [
             [lein-environ "1.2.0"]                          ; make sure to change intellij repl run options to "run it with lein"
             [lein-ring "0.12.6"]
             [lein-eftest "0.5.9"]
             ]
+  :jvm-opts ["-Dclojure.tools.logging.factory=clojure.tools.logging.impl/slf4j-factory"]
   :aliases {"kaocha" ["with-profile" "+kaocha" "run" "-m" "kaocha.runner"]}
   :repl-options {:init-ns beholder.main}
   :ring {:handler beholder.main/app

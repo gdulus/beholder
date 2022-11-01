@@ -1,7 +1,8 @@
 (ns beholder.repositories.k8s
-  (:require [kubernetes-api.core :as k8s]
+  (:require [beholder.model :as m]
+            [beholder.repositories.config :as c]
             [environ.core :refer [env]]
-            [beholder.model :as m]
+            [kubernetes-api.core :as k8s]
             [schema.core :as s])
   (:import (beholder.model KubernetesService)))
 
@@ -9,10 +10,10 @@
                                       {:insecure? true
                                        :token     (env :k8s-token)})))
 
-(defn- load-k8s-services []
+(defn- load-k8s-services [namespace]
   (k8s/invoke @k8s {:kind    :Service
                     :action  :list
-                    :request {:namespace (env :k8s-namespaces)}}))
+                    :request {:namespace namespace}}))
 
 (defn- https-callable-k8s-service? [list-resource]
   (some? (get-in list-resource [:spec :selector :app])))
@@ -38,8 +39,10 @@
 
 (defn list-services! []
   (->>
-    (load-k8s-services)
-    (:items)
+    (c/get-beholder-config!)
+    (m/get-namespaces)
+    (map load-k8s-services)
+    (mapcat :items)
     (filter https-callable-k8s-service?)
     (map response->KubernetesService)
     (map validate-KubernetesService)))
@@ -49,8 +52,6 @@
     (list-services!)
     (filter #(= id (:id %)))
     (first)))
-
-
 
 
 

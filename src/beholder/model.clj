@@ -3,7 +3,9 @@
             [schema.core :as s]))
 
 (def ^:private url (s/pred #(re-matches #"(www|http:|https:)+[^\s]+[\w]" %)))
-(def ^:private default-openapi-label :openapi)
+(def ^:private ^:const default-openapi-label :openapi)
+(def ^:private ^:const default-openapi-path "/api/openapi.yml")
+(def ^:private ^:const default-namespace ["default"])
 
 ; --------------------------------------------------------------
 
@@ -15,18 +17,34 @@
 
 ; --------------------------------------------------------------
 
-(defprotocol LabelConfigurationAware
-  (get-openapi-label [x]))
+(defn- get-value-or-default [value default converter]
+  (if (str/blank? value)
+    default
+    (converter value)))
 
+(defprotocol DefaultValuesAware
+  (get-namespaces [x])
+  (get-openapi-label [x])
+  (get-openapi-path [x]))
 
 (s/defrecord BeholderConfig [namespaces :- (s/maybe [s/Str])
                              openApiLabel :- (s/maybe s/Str)
                              openApiPath :- (s/maybe s/Str)]
-  LabelConfigurationAware
+  DefaultValuesAware
+
+  (get-namespaces [x]
+    (get-value-or-default namespaces
+                          default-namespace
+                          #(str/split % #",")))
+
   (get-openapi-label [x]
-    (if (str/blank? openApiLabel)
-      default-openapi-label
-      (keyword openApiLabel))))
+    (get-value-or-default openApiLabel
+                          default-openapi-label
+                          keyword))
+  (get-openapi-path [x]
+    (get-value-or-default openApiPath
+                          default-openapi-path
+                          identity)))
 
 ; --------------------------------------------------------------
 

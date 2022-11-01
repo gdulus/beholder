@@ -3,19 +3,18 @@
 <div class="container-fluid mt-3">
     <div class="row">
         {% for service in services %}
-        <div class="col-2">
+        <div class="col-3">
             <div class="card shadow-sm position-relative" style="height:220px">
                 <h5 class="card-header clearfix">
-                    <span class="title">{{service.k8s.name}}</span>
+                    <span class="title">{{service.name}}</span>
                     <a href="/service/{{service.id}}/config" class="float-end" title="edit"><i class="bi bi-tools"></i></a>
                 </h5>
                 <div class="card-body">
                     <p class="card-text">{{service.config.description}}</p>
-                    {% if service.config.team %}<span>owner: {{service.config.team}}</span>{% endif %}
+                    {% if service.config.team %}owner: <span>{{service.config.team}}</span>{% endif %}
                 </div>
                 <div class="card-body position-absolute bottom-0 start-0">
                     <a href="doc/swagger/{{service.id}}" class="btn btn-primary">REST doc</a>
-                    <a href="doc/swagger/{{service.id}}" class="btn btn-primary">ASYNC doc</a>
                     {% if service.config.repo %}
                     <a href="{{service.config.repo}}" target="_blank" class="btn btn-primary">Repo</a>
                     {% endif %}
