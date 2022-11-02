@@ -3,17 +3,19 @@
             [beholder.repositories.config :as c]
             [environ.core :refer [env]]
             [kubernetes-api.core :as k8s]
-            [schema.core :as s])
+            [schema.core :as s]
+            [taoensso.timbre :as log])
   (:import (beholder.model KubernetesService)))
 
 (def ^:private k8s (delay (k8s/client (env :k8s-apiserver)
                                       {:insecure? true
                                        :token     (env :k8s-token)})))
 
-(defn- load-k8s-services [namespace]
+(defn- load-k8s-services [n]
+  (log/info "Retrieving list of K8S services from namespace: " n)
   (k8s/invoke @k8s {:kind    :Service
                     :action  :list
-                    :request {:namespace namespace}}))
+                    :request {:namespace n}}))
 
 (defn- https-callable-k8s-service? [list-resource]
   (some? (get-in list-resource [:spec :selector :app])))
@@ -41,6 +43,7 @@
   (->>
     (c/get-beholder-config!)
     (m/get-namespaces)
+    (log/spy :info "Got namespaces: ")
     (map load-k8s-services)
     (mapcat :items)
     (filter https-callable-k8s-service?)

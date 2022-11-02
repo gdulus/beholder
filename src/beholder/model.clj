@@ -17,11 +17,6 @@
 
 ; --------------------------------------------------------------
 
-(defn- get-value-or-default [value default converter]
-  (if (str/blank? value)
-    default
-    (converter value)))
-
 (defprotocol GlobalConfigAware
   (get-namespaces [x])
   (get-openapi-label [x])
@@ -33,18 +28,14 @@
   GlobalConfigAware
 
   (get-namespaces [x]
-    (get-value-or-default namespaces
-                          default-namespace
-                          #(str/split % #",")))
+    (let [namespaces (remove str/blank? namespaces)]
+      (if (empty? namespaces) default-namespace namespaces)))
 
   (get-openapi-label [x]
-    (get-value-or-default openApiLabel
-                          default-openapi-label
-                          keyword))
+    (if (str/blank? openApiLabel) default-openapi-label openApiLabel))
+
   (get-openapi-path [x]
-    (get-value-or-default openApiPath
-                          default-openapi-path
-                          identity)))
+    (if (str/blank? openApiPath) default-openapi-path openApiPath)))
 
 ; --------------------------------------------------------------
 
