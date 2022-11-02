@@ -22,7 +22,7 @@
     default
     (converter value)))
 
-(defprotocol DefaultValuesAware
+(defprotocol GlobalConfigAware
   (get-namespaces [x])
   (get-openapi-label [x])
   (get-openapi-path [x]))
@@ -30,7 +30,7 @@
 (s/defrecord BeholderConfig [namespaces :- (s/maybe [s/Str])
                              openApiLabel :- (s/maybe s/Str)
                              openApiPath :- (s/maybe s/Str)]
-  DefaultValuesAware
+  GlobalConfigAware
 
   (get-namespaces [x]
     (get-value-or-default namespaces

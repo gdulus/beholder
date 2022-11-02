@@ -3,43 +3,72 @@
             [beholder.repositories.k8s :refer [list-services!]]
             [clojure.test :refer :all]))
 
-(def empty-response {})
 (def non-empty-response {:kind       "ServiceList",
                          :apiVersion "v1",
                          :metadata   {:resourceVersion "46056"},
                          :items      [
-                                      {:metadata {:name "beholder", :namespace "default", :uid "c5553c2f-fd21-4b57-921a-a3ac66bf53b1", :resourceVersion "12522", :creationTimestamp "2022-08-07T11:58:40Z", :labels {:app "beholder"}, :managedFields [{:manager "kubectl-expose", :operation "Update", :apiVersion "v1", :time "2022-08-07T11:58:40Z", :fieldsType "FieldsV1", :fieldsV1 {}}]},
+                                      {:metadata {:name "beholder", :namespace "default", :uid "id1", :resourceVersion "12522", :creationTimestamp "2022-08-07T11:58:40Z", :labels {:app "beholder"}, :managedFields [{:manager "kubectl-expose", :operation "Update", :apiVersion "v1", :time "2022-08-07T11:58:40Z", :fieldsType "FieldsV1", :fieldsV1 {}}]},
                                        :spec     {:selector {:app "beholder"}, :allocateLoadBalancerNodePorts true, :internalTrafficPolicy "Cluster", :externalTrafficPolicy "Cluster", :ipFamilies ["IPv4"], :ipFamilyPolicy "SingleStack", :clusterIP "10.99.213.16", :type "LoadBalancer", :clusterIPs ["10.99.213.16"], :ports [{:protocol "TCP", :port 3000, :targetPort 3000, :nodePort 30924}], :sessionAffinity "None"},
                                        :status   {:loadBalancer {}}}
-                                      {:metadata {:name "hello-minikube", :namespace "default", :uid "93ac81ac-3c25-4967-92ca-224251437fb8", :resourceVersion "483", :creationTimestamp "2022-05-28T10:19:33Z", :labels {:app "hello-minikube"}, :managedFields [{:manager "kubectl-expose", :operation "Update", :apiVersion "v1", :time "2022-05-28T10:19:33Z", :fieldsType "FieldsV1", :fieldsV1 {}}]},
+                                      {:metadata {:name "hello-minikube", :namespace "default", :uid "id2", :resourceVersion "483", :creationTimestamp "2022-05-28T10:19:33Z", :labels {:app "hello-minikube"}, :managedFields [{:manager "kubectl-expose", :operation "Update", :apiVersion "v1", :time "2022-05-28T10:19:33Z", :fieldsType "FieldsV1", :fieldsV1 {}}]},
                                        :spec     {:selector {:app "hello-minikube"}, :internalTrafficPolicy "Cluster", :externalTrafficPolicy "Cluster", :ipFamilies ["IPv4"], :ipFamilyPolicy "SingleStack", :clusterIP "10.104.148.167", :type "NodePort", :clusterIPs ["10.104.148.167"], :ports [{:protocol "TCP", :port 8080, :targetPort 8080, :nodePort 31003}], :sessionAffinity "None"},
                                        :status   {:loadBalancer {}}}
-                                      {:metadata {:name "kubernetes", :namespace "default", :uid "a2b05d1c-b207-4886-bbcc-f0d073931928", :resourceVersion "196", :creationTimestamp "2022-05-28T10:18:44Z", :labels {:component "apiserver", :provider "kubernetes"}, :managedFields [{:manager "kube-apiserver", :operation "Update", :apiVersion "v1", :time "2022-05-28T10:18:44Z", :fieldsType "FieldsV1", :fieldsV1 {}}]},
+                                      {:metadata {:name "kubernetes", :namespace "default", :uid "id3", :resourceVersion "196", :creationTimestamp "2022-05-28T10:18:44Z", :labels {:component "apiserver", :provider "kubernetes"}, :managedFields [{:manager "kube-apiserver", :operation "Update", :apiVersion "v1", :time "2022-05-28T10:18:44Z", :fieldsType "FieldsV1", :fieldsV1 {}}]},
                                        :spec     {:ports [{:name "https", :protocol "TCP", :port 443, :targetPort 8443}], :clusterIP "10.96.0.1", :clusterIPs ["10.96.0.1"], :type "ClusterIP", :sessionAffinity "None", :ipFamilies ["IPv4"], :ipFamilyPolicy "SingleStack", :internalTrafficPolicy "Cluster"},
                                        :status   {:loadBalancer {}}}
-                                      {:metadata {:name "openapi-app", :namespace "default", :uid "a57f9d9d-2db5-4323-a066-0fa8a8e633c4", :resourceVersion "7969", :creationTimestamp "2022-08-03T21:17:23Z", :labels {:app "openapi-app"}, :managedFields [{:manager "kubectl-expose", :operation "Update", :apiVersion "v1", :time "2022-08-03T21:17:23Z", :fieldsType "FieldsV1", :fieldsV1 {}}]},
+                                      {:metadata {:name "openapi-app", :namespace "default", :uid "id4", :resourceVersion "7969", :creationTimestamp "2022-08-03T21:17:23Z", :labels {:app "openapi-app"}, :managedFields [{:manager "kubectl-expose", :operation "Update", :apiVersion "v1", :time "2022-08-03T21:17:23Z", :fieldsType "FieldsV1", :fieldsV1 {}}]},
                                        :spec     {:selector {:app "openapi-app"}, :allocateLoadBalancerNodePorts true, :internalTrafficPolicy "Cluster", :externalTrafficPolicy "Cluster", :ipFamilies ["IPv4"], :ipFamilyPolicy "SingleStack", :clusterIP "10.100.186.35", :type "LoadBalancer", :clusterIPs ["10.100.186.35"], :ports [{:protocol "TCP", :port 3000, :targetPort 3000, :nodePort 31362}], :sessionAffinity "None"},
                                        :status   {:loadBalancer {}}}]})
 
-(defn find-K8SService-by-name [coll name]
+(def multiple-namespaces {"n1"
+                          {:kind       "ServiceList",
+                           :apiVersion "v1",
+                           :metadata   {:resourceVersion "46056"},
+                           :items      [
+                                        {:metadata {:name "app1", :namespace "n1", :uid "id1", :resourceVersion "12522", :creationTimestamp "2022-08-07T11:58:40Z", :labels {:app "app1"}, :managedFields [{:manager "kubectl-expose", :operation "Update", :apiVersion "v1", :time "2022-08-07T11:58:40Z", :fieldsType "FieldsV1", :fieldsV1 {}}]},
+                                         :spec     {:selector {:app "beholder"}, :allocateLoadBalancerNodePorts true, :internalTrafficPolicy "Cluster", :externalTrafficPolicy "Cluster", :ipFamilies ["IPv4"], :ipFamilyPolicy "SingleStack", :clusterIP "10.99.213.16", :type "LoadBalancer", :clusterIPs ["10.99.213.16"], :ports [{:protocol "TCP", :port 3000, :targetPort 3000, :nodePort 30924}], :sessionAffinity "None"},
+                                         :status   {:loadBalancer {}}}]}
+                          "n2"
+                          {:kind       "ServiceList",
+                           :apiVersion "v1",
+                           :metadata   {:resourceVersion "46056"},
+                           :items      [
+                                        {:metadata {:name "app2", :namespace "n2", :uid "id2", :resourceVersion "12522", :creationTimestamp "2022-08-07T11:58:40Z", :labels {:app "app2"}, :managedFields [{:manager "kubectl-expose", :operation "Update", :apiVersion "v1", :time "2022-08-07T11:58:40Z", :fieldsType "FieldsV1", :fieldsV1 {}}]},
+                                         :spec     {:selector {:app "beholder"}, :allocateLoadBalancerNodePorts true, :internalTrafficPolicy "Cluster", :externalTrafficPolicy "Cluster", :ipFamilies ["IPv4"], :ipFamilyPolicy "SingleStack", :clusterIP "10.99.213.16", :type "LoadBalancer", :clusterIPs ["10.99.213.16"], :ports [{:protocol "TCP", :port 3000, :targetPort 3000, :nodePort 30924}], :sessionAffinity "None"},
+                                         :status   {:loadBalancer {}}}]}})
+
+(defn- find-K8SService-by-name [coll name]
   (first (filter #(= name (:name %)) coll)))
 
-(deftest list-services-test
+(deftest ^:unit list-services-test
   (testing "Test list-services with empty response"
-    (with-redefs [beholder.repositories.k8s/load-k8s-services (fn [namespace] empty-response)
+    (with-redefs [beholder.repositories.k8s/load-k8s-services (fn [namespace] {})
                   beholder.repositories.config/get-beholder-config! (fn [] (m/->BeholderConfig "" "" ""))]
       (is (empty? (list-services!)))))
+
 
   (testing "Test list-services with non empty response"
     (with-redefs [beholder.repositories.k8s/load-k8s-services (fn [namespace] non-empty-response)
                   beholder.repositories.config/get-beholder-config! (fn [] (m/->BeholderConfig "" "" ""))]
       (let [response (list-services!)]
         (is (= 3 (count response)))
-        (is (= (m/map->KubernetesService {:id "c5553c2f-fd21-4b57-921a-a3ac66bf53b1" :name "beholder", :namespace "default", :url "http://beholder:3000", :labels {:app "beholder"}})
+        (is (= (m/map->KubernetesService {:id "id1" :name "beholder", :namespace "default", :url "http://beholder:3000", :labels {:app "beholder"}})
                (find-K8SService-by-name response "beholder")))
-        (is (= (m/map->KubernetesService {:id "93ac81ac-3c25-4967-92ca-224251437fb8" :name "hello-minikube", :namespace "default", :url "http://hello-minikube:8080", :labels {:app "hello-minikube"}})
+        (is (= (m/map->KubernetesService {:id "id2" :name "hello-minikube", :namespace "default", :url "http://hello-minikube:8080", :labels {:app "hello-minikube"}})
                (find-K8SService-by-name response "hello-minikube")))
-        (is (= (m/map->KubernetesService {:id "a57f9d9d-2db5-4323-a066-0fa8a8e633c4" :name "openapi-app", :namespace "default", :url "http://openapi-app:3000", :labels {:app "openapi-app"}})
-               (find-K8SService-by-name response "openapi-app")))))))
+        (is (= (m/map->KubernetesService {:id "id4" :name "openapi-app", :namespace "default", :url "http://openapi-app:3000", :labels {:app "openapi-app"}})
+               (find-K8SService-by-name response "openapi-app"))))))
+
+
+  (testing "Test list-services different namespaces"
+    (with-redefs [beholder.repositories.k8s/load-k8s-services (fn [namespace] (get multiple-namespaces namespace))
+                  beholder.repositories.config/get-beholder-config! (fn [] (m/->BeholderConfig "n1,n2" "" ""))]
+      (let [response (list-services!)]
+        (is (= 2 (count response)))
+        (is (= (m/map->KubernetesService {:id "id1" :name "app1", :namespace "n1", :url "http://beholder:3000", :labels {:app "app1"}})
+               (find-K8SService-by-name response "app1")))
+        (is (= (m/map->KubernetesService {:id "id2" :name "app2", :namespace "n2", :url "http://beholder:3000", :labels {:app "app2"}})
+               (find-K8SService-by-name response "app2"))))))
+  )
 
 
