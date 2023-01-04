@@ -49,7 +49,7 @@
 
   (testing "Test list-services with non empty response"
     (with-redefs [beholder.repositories.k8s/load-k8s-services (fn [namespace] non-empty-response)
-                  beholder.repositories.config/get-beholder-config! (fn [] (m/->BeholderConfig "" "" ""))]
+                  beholder.repositories.config/get-beholder-config! (fn [] (m/->BeholderConfig ["n1"] "" ""))]
       (let [response (list-services!)]
         (is (= 3 (count response)))
         (is (= (m/map->KubernetesService {:id "id1" :name "beholder", :namespace "default", :url "http://beholder:3000", :labels {:app "beholder"}})
