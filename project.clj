@@ -33,8 +33,6 @@
             [lein-environ "1.2.0"]                          ; make sure to change intellij repl run options to "run it with lein"
             [lein-ring "0.12.6"]
             [lein-eftest "0.5.9"]]
-  :jvm-opts ["-Dclojure.tools.logging.factory=clojure.tools.logging.impl/slf4j-factory"]
-  :aliases {"kaocha" ["with-profile" "+kaocha" "run" "-m" "kaocha.runner"]}
   :repl-options {:init-ns beholder.main}
   :ring {:handler beholder.main/app
          :nrepl   {:start? true :port 41111}})

@@ -62,7 +62,7 @@
 
   (testing "Test list-services different namespaces"
     (with-redefs [beholder.repositories.k8s/load-k8s-services (fn [namespace] (get multiple-namespaces namespace))
-                  beholder.repositories.config/get-beholder-config! (fn [] (m/->BeholderConfig "n1,n2" "" ""))]
+                  beholder.repositories.config/get-beholder-config! (fn [] (m/->BeholderConfig ["n1","n2"] "" ""))]
       (let [response (list-services!)]
         (is (= 2 (count response)))
         (is (= (m/map->KubernetesService {:id "id1" :name "app1", :namespace "n1", :url "http://beholder:3000", :labels {:app "app1"}})
