@@ -17,7 +17,7 @@
                     :action  :list
                     :request {:namespace n}}))
 
-(defn- https-callable-k8s-service? [openapi-label list-resource]
+(defn- valid-service? [openapi-label list-resource]
   (and (some? (get-in list-resource [:spec :selector :app]))
        (contains? (get-in list-resource [:metadata :labels]) (keyword openapi-label))))
 
@@ -42,13 +42,12 @@
 
 (defn list-services! []
   (let [config (c/get-beholder-config!)
-        openapi-label (log/spy :info "OpenaAPI label" (m/get-openapi-label config))]
+        openapi-label (log/spy :info "OpenAPI K8S label" (m/get-openapi-label config))
+        namespaces (log/spy :info "Namespaces to scan" (m/get-namespaces config))]
     (->>
-      (m/get-namespaces config)
-      (log/spy :info "Got namespaces")
-      (map load-k8s-services)
+      (map load-k8s-services namespaces)
       (mapcat :items)
-      (filter #(https-callable-k8s-service? openapi-label %))
+      (filter #(valid-service? openapi-label %))
       (map response->KubernetesService)
       (map validate-KubernetesService))))
 
