@@ -31,6 +31,14 @@
                         </div>
                     </div>
                     <div class="mb-3">
+                        <label for="repo" class="form-label">Labels</label>
+                        <div>
+                            {% for label in service.labels %}
+                            <span class="badge text-bg-info">{{label}}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
                         <label for="team" class="form-label">Team ownership</label>
                         <input type="text" class="form-control" name="team" id="team"
                                aria-describedby="teamHelp" value="{{data.team}}">
