@@ -10,7 +10,7 @@
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults]]
             [ring.util.http-response :refer :all]
-            [taoensso.timbre :refer [info error]]))
+            [taoensso.timbre :refer [info]]))
 
 
 ; ---------------------------------------------------------------
@@ -24,7 +24,6 @@
        :code   code}
       )))
 
-
 (defroutes app-routes
            (route/resources "/static")
 
@@ -35,18 +34,25 @@
            ;; ------------------------------------------------------------
 
            (context "/service/:id" [id]
-             (GET "/config" []
-               (ok (tmpl/html "service-config.html"
-                              {:service (k8s/get-service! id)
-                               :data    (conf/get-service-config id)})))
+             (GET "/config" [status]
+               (let [beholder-conf (conf/get-beholder-config!)
+                     service-conf (conf/get-service-config id)
+                     k8s-service (k8s/get-service! id)
+                     api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)
+                     docs (client/get api-doc-url)]
+                 (ok (tmpl/html "service-config.html"
+                                {:service     k8s-service
+                                 :data        service-conf
+                                 :api-doc-url api-doc-url
+                                 :docs docs
+                                 :status status}))))
 
              (POST "/config" [openApiPath team repo description]
-               (->>
-                 (m/->ServiceConfig id openApiPath team repo description)
-                 (conf/save-service-config!)
-                 (assoc {:status :success :service (k8s/get-service! id)} :data)
-                 (tmpl/html "service-config.html")
-                 (ok))))
+               (as->
+                 (m/->ServiceConfig id openApiPath team repo description) v
+                 (conf/save-service-config! v)
+                 (str "/service/" id "/config?status=success")
+                 (moved-permanently v))))
 
            ;; ------------------------------------------------------------
 

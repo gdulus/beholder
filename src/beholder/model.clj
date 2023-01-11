@@ -4,7 +4,7 @@
 
 (def ^:private url (s/pred #(re-matches #"(www|http:|https:)+[^\s]+[\w]" %)))
 (def ^:private ^:const default-openapi-label :openapi)
-(def ^:private ^:const default-openapi-path "/api/openapi.yml")
+(def ^:private ^:const default-openapi-path "api/openapi.yml")
 (def ^:private ^:const default-namespace ["default"])
 
 ; --------------------------------------------------------------
@@ -51,3 +51,11 @@
                       name :- s/Str
                       openApiEnabled? :- s/Bool
                       config :- (s/maybe ServiceConfig)])
+
+
+; --------------------------------------------------------------
+
+(defn get-openapi-url [beholder-config k8s-service-conf service-conf]
+  (str (:url k8s-service-conf) "/" (if (not (str/blank? (:openApiPath service-conf)))
+                                 (:openApiPath service-conf)
+                                 (get-openapi-path beholder-config))))
