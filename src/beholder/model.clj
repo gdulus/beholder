@@ -55,7 +55,12 @@
 
 ; --------------------------------------------------------------
 
+(defn- sanitize-path [path]
+  (-> (str "/" path)
+      (str/replace #"/+" "/")
+      (subs 1)))
+
 (defn get-openapi-url [beholder-config k8s-service-conf service-conf]
   (str (:url k8s-service-conf) "/" (if (not (str/blank? (:openApiPath service-conf)))
-                                 (:openApiPath service-conf)
-                                 (get-openapi-path beholder-config))))
+                                     (sanitize-path (:openApiPath service-conf))
+                                     (sanitize-path (get-openapi-path beholder-config)))))

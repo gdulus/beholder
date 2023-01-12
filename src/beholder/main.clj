@@ -57,8 +57,8 @@
                (let [beholder-conf (conf/get-beholder-config!)
                      service-conf (conf/get-service-config id)
                      k8s-service (k8s/get-service! id)
-                     api-doc-url (log/spy :info "Requesting documentation for"
-                                          (m/get-openapi-url beholder-conf k8s-service service-conf))]
+                     api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)]
+                 (log/info "Requesting OpenAPI doc from" api-doc-url)
                  (client/get api-doc-url))))
 
            ;; ------------------------------------------------------------
@@ -71,6 +71,7 @@
                  {:data v}
                  (tmpl/html "beholder-config.html" v)
                  (ok v)))
+
              (POST "/" [namespaces openApiLabel openApiPath]
                (->>
                  (m/->BeholderConfig (split namespaces #",") openApiLabel, openApiPath)
@@ -79,34 +80,16 @@
                  (tmpl/html "beholder-config.html")
                  (ok))))
 
-           ;; ------------------------------------------------------------
+           ; ------------------------------------------------------------
 
-           (GET "/doc/swagger/:id" [id]
+           (GET "/doc/openapi/:id" [id]
              (ok (tmpl/html "swagger-ui.html" {:id id})))
 
+           ; ------------------------------------------------------------
 
-
-           (context "/debug" []
-             (GET "/" [] (ok (tmpl/html "debug.html")))
-             (POST "/" [code] (ok (tmpl/html "debug.html" (eval-code code)))))
-
-
-
-           ;
-           ;(GET "/doc/:id" [id]
-           ;  (ok (tmpl/html "doc.html"
-           ;                 {:doc {:id id}})))
-           ;
-
-           ;
-           ;(context "/proxy" []
-           ;  ;; Load page
-           ;  (GET "/:id" [id]
-           ;    (ok (->> (r/get-documentation! id)
-           ;             (proxy/request-page! "/proxy/static/"))))
-           ;  ;; Load static resources
-           ;  (GET "/static/:encoded-url/:resource" [encoded-url resource]
-           ;    (proxy/request-content! encoded-url resource)))
+           ;(context "/debug" []
+           ;  (GET "/" [] (ok (tmpl/html "debug.html")))
+           ;  (POST "/" [code] (ok (tmpl/html "debug.html" (eval-code code)))))
 
            (ANY "*" [] (not-found "404")))
 

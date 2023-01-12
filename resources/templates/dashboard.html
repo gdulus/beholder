@@ -14,7 +14,7 @@
                     {% if service.config.team %}owner: <span>{{service.config.team}}</span>{% endif %}
                 </div>
                 <div class="card-body position-absolute bottom-0 start-0">
-                    <a href="doc/swagger/{{service.id}}" class="btn btn-primary">REST doc</a>
+                    <a href="/doc/openapi/{{service.id}}" class="btn btn-primary">REST doc</a>
                     {% if service.config.repo %}
                     <a href="{{service.config.repo}}" target="_blank" class="btn btn-primary">Repo</a>
                     {% endif %}
