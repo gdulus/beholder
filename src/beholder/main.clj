@@ -10,7 +10,7 @@
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults]]
             [ring.util.http-response :refer :all]
-            [taoensso.timbre :refer [info]]))
+            [taoensso.timbre :as log]))
 
 
 ; ---------------------------------------------------------------
@@ -34,25 +34,32 @@
            ;; ------------------------------------------------------------
 
            (context "/service/:id" [id]
+
              (GET "/config" [status]
                (let [beholder-conf (conf/get-beholder-config!)
                      service-conf (conf/get-service-config id)
                      k8s-service (k8s/get-service! id)
-                     api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)
-                     docs (client/get api-doc-url)]
+                     api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)]
                  (ok (tmpl/html "service-config.html"
                                 {:service     k8s-service
                                  :data        service-conf
                                  :api-doc-url api-doc-url
-                                 :docs docs
-                                 :status status}))))
+                                 :status      status}))))
 
              (POST "/config" [openApiPath team repo description]
                (as->
                  (m/->ServiceConfig id openApiPath team repo description) v
                  (conf/save-service-config! v)
                  (str "/service/" id "/config?status=success")
-                 (moved-permanently v))))
+                 (moved-permanently v)))
+
+             (GET "/openapi" [id]
+               (let [beholder-conf (conf/get-beholder-config!)
+                     service-conf (conf/get-service-config id)
+                     k8s-service (k8s/get-service! id)
+                     api-doc-url (log/spy :info "Requesting documentation for"
+                                          (m/get-openapi-url beholder-conf k8s-service service-conf))]
+                 (client/get api-doc-url))))
 
            ;; ------------------------------------------------------------
 
@@ -74,20 +81,15 @@
 
            ;; ------------------------------------------------------------
 
+           (GET "/doc/swagger/:id" [id]
+             (ok (tmpl/html "swagger-ui.html" {:id id})))
+
+
+
            (context "/debug" []
              (GET "/" [] (ok (tmpl/html "debug.html")))
              (POST "/" [code] (ok (tmpl/html "debug.html" (eval-code code)))))
 
-           (GET "/doc/swagger/:id" [id]
-             (ok (tmpl/html "swagger-ui.html"
-                            {:id id})))
-
-           (GET "/proxy/:id/swagger" [id]
-             (as->
-               (k8s/get-service! id) v
-               (:url v)
-               (str v "/static/api.json") v
-               (client/get v)))
 
 
            ;
@@ -118,7 +120,8 @@
 ;        (error "Error while handling request" e)
 ;        (internal-server-error (tmpl/html "errors/500.html" {:error e}))))))
 
-(info "Starting Beholder app")
+
+(log/info "Starting Beholder app")
 
 (def app
   (->
