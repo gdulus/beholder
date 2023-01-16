@@ -1,5 +1,5 @@
 # beholder
-Beholder is a service documentation search engine with K8S and microservice first approach.
+Beholder is a microservice documentation search engine with K8S first approach.
 
 ### Motivation
 Common approach with delivery for service documentation is to use services like https://swagger.io or https://apiary.io to read documentation from project repo and make it accessible over service page.
