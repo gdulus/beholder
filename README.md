@@ -1,6 +1,4 @@
 # beholder
-
------------------------------------
 Beholder is a service documentation search engine with K8S and microservice first approach.
 
 ### Motivation
