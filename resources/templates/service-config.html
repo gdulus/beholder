@@ -25,22 +25,26 @@
                     </div>
                     <div class="mb-3">
                         <label for="team" class="form-label">Current OpenAPI URL</label>
-                        <input disabled type="text" class="form-control" aria-describedby="teamHelp" value="{{api-doc-url}}">
+                        <input disabled type="text" class="form-control" aria-describedby="teamHelp"
+                               value="{{api-doc-url}}">
                     </div>
                     <div class="mb-3">
-                        <label for="repo" class="form-label">OpenAPI file status</label>
-                        <div>
-                            <span class="badge text-bg-danger">File not found</span>
-                            <span class="badge text-bg-success">File found</span>
-                        </div>
+                        <label for="repo" class="form-label">OpenAPI file status: </label>
+                        {% if api-doc-status = :ok %}
+                        <span class="badge text-bg-success">File found</span>
+                        {% elif api-doc-status = :not-found %}
+                        <span class="badge text-bg-danger">File not found</span>
+                        {% else %}
+                        <span class="badge text-bg-danger">Error while checking for the file</span>
+                        {% endif %}
+
                     </div>
                     <div class="mb-3">
-                        <label for="repo" class="form-label">Labels</label>
-                        <div>
-                            {% for label in service.labels %}
+                        <label for="repo" class="form-label">Labels:</label>
+                        {% for label in service.labels %}
                             <span class="badge text-bg-info">{{label}}</span>
-                            {% endfor %}
-                        </div>
+                        {% endfor %}
+
                     </div>
                     <div class="mb-3">
                         <label for="team" class="form-label">Team ownership</label>

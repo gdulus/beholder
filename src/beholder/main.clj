@@ -24,6 +24,15 @@
        :code   code}
       )))
 
+(defn- get-openapi-status [openapi-doc-url]
+  (try
+    (case (:status (client/head openapi-doc-url {:throw-exceptions false}))
+      200 :ok
+      404 :not-found
+      :error)
+    (catch Exception e
+      :error)))
+
 (defroutes app-routes
            (route/resources "/static")
 
@@ -39,12 +48,14 @@
                (let [beholder-conf (conf/get-beholder-config!)
                      service-conf (conf/get-service-config id)
                      k8s-service (k8s/get-service! id)
-                     api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)]
+                     api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)
+                     api-doc-status (get-openapi-status api-doc-url)]
                  (ok (tmpl/html "service-config.html"
-                                {:service     k8s-service
-                                 :data        service-conf
-                                 :api-doc-url api-doc-url
-                                 :status      status}))))
+                                {:service        k8s-service
+                                 :data           service-conf
+                                 :api-doc-url    api-doc-url
+                                 :api-doc-status api-doc-status
+                                 :status         status}))))
 
              (POST "/config" [openApiPath team repo description]
                (as->

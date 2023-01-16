@@ -3,7 +3,6 @@ COPY ./target/beholder-0.1.0-SNAPSHOT-standalone.jar /home/beholder-0.1.0-SNAPSH
 ENTRYPOINT java \
 -Des-hosts=http://host.minikube.internal:9200 \
 -Dk8s-apiserver=https://kubernetes.default.svc \
--Dk8s-namespaces=default \
 -Dk8s-token=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
 -server \
 -jar /home/beholder-0.1.0-SNAPSHOT-standalone.jar
