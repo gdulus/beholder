@@ -1,39 +1,31 @@
 # beholder
 
-API documentation search engine with microservice and K8S first approach. 
+-----------------------------------
+Beholder is a service documentation search engine with K8S and microservice first approach.
 
-## Usage
+### Motivation
+Common approach with delivery for service documentation is to use services like https://swagger.io or https://apiary.io to read documentation from project repo and make it accessible over service page.
 
-TBD
+Beholder take different approach. It uses services deployed to K8S cluster as carriers of the documentation files.
 
-## Installation
+There is no need for external service serving the doc. There is no ambiguity which version of documentation is deployed to the specific environment. There is just BEHOLDER!
 
-1. Install FireFox Geckodriver: ```sudo apt-get install firefox-geckodriver```    
-2. Install ElasticSearch
+### Requirements
 
-## Tasks
+* Elastics Search (tested with version 7.17.6)
+* Kubernetes (tested with version 1.23.3)
 
-```
-# DEPLOY IMAGE TO MINIKUBE AND EXPOSE IT
-eval $(minikube docker-env)  
-docker build -t openapi-app:1.0.0 .
-kubectl create deployment openapi-app --image=openapi-app:1.0.0
-kubectl expose deployment openapi-app --type=LoadBalancer --port=3000
+### Usage
 
-# CLEANUP
-docker rm openapi-app
-docker image rm openapi-app:1.0.0 
-```
+First of all, you need to deploy Beholder to K8S cluster. Beholder will need to have access to two things:
 
-## Setting up minikube
-```
-kubectl apply -f ./infra/k8s/ClusterRole.yml
-kubectl create clusterrolebinding service-reader-pod \
---clusterrole=service-reader  \
---serviceaccount=default:default
-```
+* ES instance 
+* K8S API 
 
-## License
+
+
+
+### License
 
 MIT License
 
