@@ -5,7 +5,7 @@
             [clojure.test :refer :all]
             [ring.mock.request :as mock]))
 
-(deftest ^:unit your-handler-test
+(deftest ^:unit handlers-test
 
   (testing "Test service/:id/openapi route"
     (with-redefs [beholder.repositories.config/get-beholder-config! (fn [] (m/map->BeholderConfig {}))
