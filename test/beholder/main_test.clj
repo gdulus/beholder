@@ -20,9 +20,9 @@
 
 (deftest ^:unit your-handler-test
   (with-redefs [beholder.repositories.config/get-beholder-config! (fn [] (m/map->BeholderConfig {}))
-                beholder.repositories.config/get-service-config (fn [id] (m/map->ServiceConfig {:openApiPath "/OAI/OpenAPI-Specification/main/examples/v3.0/api-with-examples.yaml"}))
+                beholder.repositories.config/get-service-config (fn [id] (m/map->ServiceConfig {:openApiPath "/gdulus/beholder/main/test/empty.json"}))
                 beholder.repositories.k8s/get-service! (fn [id] (m/map->KubernetesService {:url "https://raw.githubusercontent.com"}))]
     (is (= (routes/app-routes (mock/request :get "/service/12345678/openapi"))
            {:status  200
-            :body    "Your expected result"}))))
+            :body    "{}"}))))
 
