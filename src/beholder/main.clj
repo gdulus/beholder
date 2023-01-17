@@ -15,15 +15,6 @@
 
 ; ---------------------------------------------------------------
 
-(defn- eval-code [code]
-  (try
-    {:result (eval (read-string code))
-     :code   code}
-    (catch Exception e
-      {:result e
-       :code   code}
-      )))
-
 (defn- get-openapi-status [openapi-doc-url]
   (try
     (case (:status (client/head openapi-doc-url {:throw-exceptions false}))
@@ -96,11 +87,6 @@
            (GET "/doc/openapi/:id" [id]
              (ok (tmpl/html "swagger-ui.html" {:id id})))
 
-           ; ------------------------------------------------------------
-
-           ;(context "/debug" []
-           ;  (GET "/" [] (ok (tmpl/html "debug.html")))
-           ;  (POST "/" [code] (ok (tmpl/html "debug.html" (eval-code code)))))
 
            (ANY "*" [] (not-found "404")))
 
@@ -113,9 +99,6 @@
       (catch Exception e
         (log/error "Error while handling request" e)
         (internal-server-error (tmpl/html "errors/500.html" {:error e}))))))
-
-
-(log/info "Starting Beholder app")
 
 (def app
   (->

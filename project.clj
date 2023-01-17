@@ -35,7 +35,5 @@
             [lein-ring "0.12.6"]
             [lein-eftest "0.6.0"]]
   :repl-options {:init-ns beholder.main}
-  :test-selectors {:default (complement :unit)
-                   :unit :unit}
   :ring {:handler beholder.main/app
          :nrepl   {:start? true :port 41111}})

@@ -4,7 +4,8 @@
             [environ.core :refer [env]]
             [qbits.spandex :as e]
             [schema.core :as s]
-            [taoensso.timbre :refer [spy]])
+            [taoensso.timbre :refer [spy]]
+            [taoensso.timbre :as log])
   (:import (beholder.model BeholderConfig)
            (beholder.model ServiceConfig)))
 
@@ -44,7 +45,7 @@
         (throw e)))))
 
 (defn get-by-id-and-validate [url model-class ->model-record]
-  (when-let [conf (get-by-id url)]
+  (when-let [conf (not-empty (get-by-id url))]
     (s/validate model-class (->model-record conf))))
 
 (defn validate-and-save [url model-class model-data]
