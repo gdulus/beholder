@@ -1,0 +1,8 @@
+FROM openjdk:17-alpine
+COPY ./bin/beholder-current.jar /home/beholder-current.jar
+ENTRYPOINT java \
+-Des-hosts=<ES_HOST> \
+-Dk8s-apiserver=https://kubernetes.default.svc \
+-Dk8s-token=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
+-server \
+-jar /home/beholder-current.jar

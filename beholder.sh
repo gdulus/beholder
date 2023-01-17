@@ -15,9 +15,8 @@ docker-build() {
   echo '-----------------------------------------------'
   echo 'BUILDING DOCKER IMAGE'
   lein clean
-  #lein eftest
   lein ring uberjar
-  docker build -t beholder:1.0.0 .
+  docker build . -t beholder:1.0.0 -f Dockerfile.dev
   echo 'DONE'
   echo '-----------------------------------------------'
 }

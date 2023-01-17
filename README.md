@@ -6,21 +6,64 @@ Common approach with delivery for service documentation is to use services like 
 
 Beholder take different approach. It uses services deployed to K8S cluster as carriers of the documentation files.
 
-There is no need for external service serving the doc. There is no ambiguity which version of documentation is deployed to the specific environment. There is just BEHOLDER!
+There is no need for external service serving the doc. There is no ambiguity which version of documentation is deployed to the specific environment.
 
 ### Requirements
 
 * Elastics Search (tested with version 7.17.6)
 * Kubernetes (tested with version 1.23.3)
 
-### Usage
+### Installation
 
 First of all, you need to deploy Beholder to K8S cluster. Beholder will need to have access to two things:
 
-* ES instance 
 * K8S API 
+* ES instance 
 
+Next we need to build docker image. Update `Dockerfile.prod` file by replacing `<ES_HOST>` placeholder with ES hosts urls.  
 
+To build Beholder docker image use command below:
+
+```shell
+docker build . -t beholder:1.0.0 -f Dockerfile.prod
+```
+
+After deployment you need to grant permissions to K8S API. Example below shows how necessary list of privileges can be set. 
+By no mean it's an optimal way but a showcase of the requirements.     
+
+```shell
+kubectl apply -f ./infra/k8s/ClusterRole.yml
+
+kubectl create clusterrolebinding service-reader-pod \
+--clusterrole=service-reader  \
+--serviceaccount=default:default
+```
+
+### Usage
+
+#### Global config
+![global config](./docs/global_config.png)
+
+Beholder does not list all services running in your cluster. It uses global configuration to limit search by specified namespaces and labels.
+
+First of all provide coma separated list of namespaces to which Beholder should have access. If none selected `default` will be used.
+
+Next, specify label which is going to be used to tag services exposing OpenAPI config files. For example:
+
+```shell
+kubectl label service openapi-app openapi=true
+```
+
+Last thing you can configure on global level is path under which OpenaApi file can be found. 
+If not specified `api/openapi.yml` is going to be used.
+
+#### Service config
+![global config](./docs/service_config.png)
+
+For each service discovered by Beholder you have possibility to override some global setting or provide small amount of meta information (team ownership, repo link etc).
+
+This overview shows also which labels have been discovered by Beholder, what is current path to OpenAPI config url for this particular service 
+and if file can be resolved.
 
 
 ### License
