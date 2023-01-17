@@ -105,14 +105,14 @@
            (ANY "*" [] (not-found "404")))
 
 
-;(defn wrap-fallback-exception
-;  [handler]
-;  (fn [request]
-;    (try
-;      (handler request)
-;      (catch Exception e
-;        (error "Error while handling request" e)
-;        (internal-server-error (tmpl/html "errors/500.html" {:error e}))))))
+(defn wrap-fallback-exception
+  [handler]
+  (fn [request]
+    (try
+      (handler request)
+      (catch Exception e
+        (log/error "Error while handling request" e)
+        (internal-server-error (tmpl/html "errors/500.html" {:error e}))))))
 
 
 (log/info "Starting Beholder app")
@@ -124,5 +124,4 @@
                              :multipart  true
                              :nested     true
                              :keywordize true}})
-    ;wrap-fallback-exception
-    ))
+    wrap-fallback-exception))
