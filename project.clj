@@ -1,5 +1,5 @@
-(defproject beholder "0.1.0-SNAPSHOT"
-  :description "API documentation search engine with microservice and K8S first approach."
+(defproject beholder "0.1.0"
+  :description "Documentation search engine with K8S first approach."
   :license {:name "MIT License" :url "https://opensource.org/licenses/MIT"}
   :dependencies [
                  ;; -------------- base -----------------------------------

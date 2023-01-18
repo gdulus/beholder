@@ -1,5 +1,8 @@
 # beholder
-Beholder is a microservice documentation search engine with K8S first approach.
+![](https://img.shields.io/badge/current%20version-0.1.0-green)
+
+
+>Documentation search engine with K8S first approach.
 
 ### Motivation
 Common approach with delivery for service documentation is to use services like https://swagger.io or https://apiary.io to read documentation from project repo and make it accessible over service page.
@@ -28,7 +31,7 @@ To build Beholder docker image use command below:
 docker build . -t beholder:1.0.0 -f Dockerfile.prod
 ```
 
-After deployment you need to grant permissions to K8S API. Example below shows how necessary list of privileges can be set. 
+After the deployment you need to grant permissions to K8S API. Example below shows how necessary list of privileges can be set. 
 By no mean it's an optimal way but a showcase of the requirements.     
 
 ```shell
