@@ -58,7 +58,7 @@ kubectl label service openapi-app openapi=true
 ```
 
 Last thing you can configure on global level is path under which OpenaApi file can be found. 
-If not specified `api/openapi.yml` is going to be used.
+If not specified `api/openapi.yml` is going to be used. You can provide config files in json or yaml format.
 
 #### Service config
 ![global config](./docs/service_config.png)
