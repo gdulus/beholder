@@ -5,7 +5,7 @@
 >Documentation search engine with K8S first approach.
 
 ### Motivation
-Common approach with delivery for service documentation is to use services like https://swagger.io or https://apiary.io to read documentation from project repo and make it accessible over service page.
+Common approach with service documentation delivery is to use tools like https://swagger.io or https://apiary.io to read documentation from project repo and make it accessible over service page.
 
 Beholder take different approach. It uses services deployed to K8S cluster as carriers of the documentation files.
 
