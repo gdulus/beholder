@@ -73,16 +73,23 @@
                                                 (shell "kubectl create deployment beholder --image=beholder:dev")
                                                 (shell "kubectl expose deployment beholder --type=LoadBalancer --port=3000")
                                                 (shell "sleep 3")
+                                                (println "-----------------------------")
+                                                (println "beholder can be found under url: ")
                                                 (shell "minikube service beholder --url")))
 
 
 ; -----------------------------------------------------------------------
 
-(let [[cmd] *command-line-args*]
-  (as->
-    cmd v
-    (or (keyword v) (what-to-do-dialog))
-    (command v)))
+(try
+  (let [[cmd] *command-line-args*]
+    (as->
+      cmd v
+      (or (keyword v) (what-to-do-dialog))
+      (command v))
+    (System/exit 0))
+  (catch Exception e
+    (shell "clear")
+    (System/exit 0)))
 
 
-(System/exit 0)
+
