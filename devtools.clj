@@ -19,7 +19,7 @@
 ; -----------------------------------------------------------------------
 
 (defn print-help []
-  (println "Usage : ./dt.clj <command>")
+  (println "Usage : ./devtools.clj (command?) ")
   (println "Supported commands :")
   (run! (fn [[k v]] (println (str "- " (name k) " -> " v))) commands))
 
