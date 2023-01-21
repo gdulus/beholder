@@ -25,8 +25,16 @@
 
       (testing "When update-config! executes successfully should return saved BeholderConfig"
         (is (some? (r/create-indexes!)))
-        (is (= (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_1", "my/path/1")
-               (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_1", "my/path/1"))))
+        (is (= (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"],
+                                   "openApiLabel_1"
+                                   "my/path/1"
+                                   "asyncApiLabel_1"
+                                   "my/path/2")
+               (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"],
+                                                            "openApiLabel_1"
+                                                            "my/path/1"
+                                                            "asyncApiLabel_1"
+                                                            "my/path/2"))))
         (is (some? (r/delete-indexes!))))
 
       (testing "When no BeholderConfig entries get-config! should return nil"
@@ -36,20 +44,48 @@
 
       (testing "When one BeholderConfig entry get-config! should return it"
         (is (some? (r/create-indexes!)))
-        (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_1", "my/path/1"))))
+        (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"]
+                                                                "openApiLabel_1"
+                                                                "my/path/1"
+                                                                "asyncApiLabel_1"
+                                                                "my/path/2"))))
         (Thread/sleep 1000)
-        (is (= (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_1", "my/path/1")
+        (is (= (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"]
+                                   "openApiLabel_1"
+                                   "my/path/1"
+                                   "asyncApiLabel_1"
+                                   "my/path/2")
                (r/get-beholder-config!)))
         (is (some? (r/delete-indexes!))))
 
       (testing "When more than one BeholderConfig entries get-config! should return the latest one"
         (is (some? (r/create-indexes!)))
-        (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_1", "my/path/1"))))
-        (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_2", "my/path/2"))))
-        (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_3", "my/path/3"))))
-        (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_4", "my/path/4"))))
+        (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"]
+                                                                "openApiLabel_1"
+                                                                "my/path/1"
+                                                                "asyncApiLabel_1"
+                                                                "my/async/1"))))
+        (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"]
+                                                                "openApiLabel_2"
+                                                                "my/path/2"
+                                                                "asyncApiLabel_2"
+                                                                "my/async/2"))))
+        (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"]
+                                                                "openApiLabel_3"
+                                                                "my/path/3"
+                                                                "asyncApiLabel_3"
+                                                                "my/async/3"))))
+        (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"]
+                                                                "openApiLabel_4"
+                                                                "my/path/4"
+                                                                "asyncApiLabel_4"
+                                                                "my/async/4"))))
         (Thread/sleep 1000)
-        (is (= (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"], "openApiLabel_4", "my/path/4")
+        (is (= (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"]
+                                   "openApiLabel_4"
+                                   "my/path/4"
+                                   "asyncApiLabel_4"
+                                   "my/async/4")
                (r/get-beholder-config!)))
         (is (some? (r/delete-indexes!)))))
 

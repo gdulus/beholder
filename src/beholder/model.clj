@@ -24,7 +24,9 @@
 
 (s/defrecord BeholderConfig [namespaces :- (s/maybe [s/Str])
                              openApiLabel :- (s/maybe s/Str)
-                             openApiPath :- (s/maybe s/Str)]
+                             openApiPath :- (s/maybe s/Str)
+                             asyncApiLabel :- (s/maybe s/Str)
+                             asyncApiPath :- (s/maybe s/Str)]
   GlobalConfigAware
 
   (get-namespaces [x]

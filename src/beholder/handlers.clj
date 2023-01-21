@@ -1,10 +1,10 @@
 (ns beholder.handlers
-  (:require [beholder.model :as m]
+  (:require [beholder.helpers :refer [fetch-remote-resource remote-resource-exists?]]
+            [beholder.model :as m]
             [beholder.repositories.config :as conf]
             [beholder.repositories.k8s :as k8s]
             [beholder.services.dashboard :as dashboard]
             [beholder.template :as tmpl]
-            [clj-http.client :as client]
             [clojure.string :refer [split]]
             [compojure.core :refer :all]
             [compojure.route :as route]
@@ -12,17 +12,6 @@
             [ring.util.http-response :refer :all]
             [taoensso.timbre :as log]))
 
-
-(defn get-openapi-status [openapi-doc-url]
-  (try
-    (case (:status (client/head openapi-doc-url {:throw-exceptions false}))
-      200 :ok
-      404 :not-found
-      :error)
-    (catch Exception e
-      :error)))
-
-; ---------------------------------------------------------------
 
 (defroutes app-routes
            (route/resources "/static")
@@ -48,9 +37,13 @@
                  (tmpl/html "beholder-config.html" v)
                  (ok v)))
 
-             (POST "/" [namespaces openApiLabel openApiPath]
+             (POST "/" [namespaces openApiLabel openApiPath asyncApiLabel asyncApiPath]
                (->>
-                 (m/->BeholderConfig (split namespaces #",") openApiLabel, openApiPath)
+                 (m/->BeholderConfig (split namespaces #",")
+                                     openApiLabel
+                                     openApiPath
+                                     asyncApiLabel
+                                     asyncApiPath)
                  (conf/save-beholder-config!)
                  (assoc {:status :success} :data)
                  (tmpl/html "beholder-config.html")
@@ -66,7 +59,7 @@
                      service-conf (conf/get-service-config id)
                      k8s-service (k8s/get-service! id)
                      api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)
-                     api-doc-status (get-openapi-status api-doc-url)]
+                     api-doc-status (remote-resource-exists? api-doc-url)]
                  (ok (tmpl/html "service-config.html"
                                 {:service        k8s-service
                                  :data           service-conf
@@ -87,15 +80,15 @@
 
            (context "/service/:id/doc/openapi" [id]
              (GET "/" []
-                  (ok (tmpl/html "openapi-ui.html" {:id id})))
+               (ok (tmpl/html "openapi-ui.html" {:id id})))
 
              (GET "/proxy" []
-                  (let [beholder-conf (conf/get-beholder-config!)
-                        service-conf (conf/get-service-config id)
-                        k8s-service (k8s/get-service! id)
-                        api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)]
-                    (log/info "Requesting OpenAPI doc from" api-doc-url)
-                    (client/get api-doc-url))))
+               (let [beholder-conf (conf/get-beholder-config!)
+                     service-conf (conf/get-service-config id)
+                     k8s-service (k8s/get-service! id)
+                     api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)]
+                 (log/info "Requesting OpenAPI doc from" api-doc-url)
+                 (fetch-remote-resource api-doc-url))))
 
            ;; ------------------------------------------------------------
            ;; OTHER

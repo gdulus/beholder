@@ -30,7 +30,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="repo" class="form-label">OpenAPI file status: </label>
-                        {% if api-doc-status = :ok %}
+                        {% if api-doc-status = :found %}
                         <span class="badge text-bg-success">File found</span>
                         {% elif api-doc-status = :not-found %}
                         <span class="badge text-bg-danger">File not found</span>

@@ -26,7 +26,7 @@
                         <input type="text" class="form-control" name="openApiLabel" id="openApiLabel"
                                aria-describedby="openApiLabelHelp" value="{{data.openApiLabel}}">
                         <div id="openApiLabelHelp" class="form-text">Marker label identifying service as exposing
-                            OpenAPI doc.
+                            <a href="https://swagger.io/specification/" target="_blank">OpenAPI doc</a>.
                             When empty "openapi" will be used.
                         </div>
                     </div>
@@ -36,7 +36,25 @@
                                aria-describedby="openApiPathHelp" value="{{data.openApiPath}}">
                         <div id="openApiPathHelp" class="form-text">Path under which OpenAPI doc is exposed by
                             service.
-                            When empty "api/openapi.yml" will be used. Only .yml files are supported.
+                            When empty "api/openapi.yml" will be used. Files in .yml or .json format are supported.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="asyncApiLabel" class="form-label">AsyncAPI label</label>
+                        <input type="text" class="form-control" name="asyncApiLabel" id="asyncApiLabel"
+                               aria-describedby="asyncApiLabelHelp" value="{{data.asyncApiLabel}}">
+                        <div id="asyncApiLabelHelp" class="form-text">Marker label identifying service as exposing
+                            <a href="https://www.asyncapi.com/docs/reference/specification/v2.0.0" target="_blank">AsyncAPI doc</a>.
+                            When empty "asyncapi" will be used.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="asyncApiPath" class="form-label">AsyncAPI doc default path</label>
+                        <input type="text" class="form-control" name="asyncApiPath" id="asyncApiPath"
+                               aria-describedby="asyncApiPathHelper" value="{{data.asyncApiPath}}">
+                        <div id="asyncApiPathHelper" class="form-text">Path under which AsyncAPI doc is exposed by
+                            service.
+                            When empty "api/asyncapi.yml" will be used. Only .yml files are supported.
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Update</button>
