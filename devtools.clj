@@ -11,8 +11,7 @@
 (defn safe-shell [cmd]
   (try
     (shell cmd)
-    (catch Exception e
-      )))
+    (catch Exception _)))
 
 (defn what-to-do-dialog []
   (menu "BEHOLDER DEV TOOLS" "What do you want to do?" commands))
