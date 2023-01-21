@@ -35,7 +35,7 @@
             [lein-ring "0.12.6"]
             [lein-eftest "0.6.0"]]
   :profiles {:kaocha {:dependencies [[lambdaisland/kaocha "1.75.1190"]]}}
-  :aliases {"kaocha" ["with-profile" "+kaocha" "run" "-m" "kaocha.runner" "--reporter" "kaocha.report.progress/report"]}
+  :aliases {"kaocha" ["with-profile" "+kaocha" "run" "-m" "kaocha.runner" "--reporter" "kaocha.report/documentation"]}
   :repl-options {:init-ns beholder.handlers}
   :ring {:handler beholder.handlers/app
          :nrepl   {:start? true :port 41111}})
