@@ -25,14 +25,14 @@
 
 (defn beholder-clean []
   (println "-----------------------------")
-  (println "cleaning docker")
+  (println "removing beholder from docker repo")
   (println "-----------------------------")
   (safe-shell "docker rm beholder")
   (safe-shell "docker image rm beholder:dev"))
 
 (defn k8s-clean []
   (println "-----------------------------")
-  (println "cleaning minikube")
+  (println "removing beholder from k8s")
   (println "-----------------------------")
   (safe-shell "kubectl delete deployment beholder")
   (safe-shell "kubectl delete service beholder"))
