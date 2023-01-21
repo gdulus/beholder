@@ -14,15 +14,15 @@
     (catch Exception e
       )))
 
-(defn print-help []
-  (println "Usage : ./dt.clj <command>")
-  (println "Supported commands :")
-  (run! (fn [[k v]] (println (str "- " (name k) " -> " v))) commands))
-
 (defn what-to-do-dialog []
   (menu "BEHOLDER DEV TOOLS" "What do you want to do?" commands))
 
 ; -----------------------------------------------------------------------
+
+(defn print-help []
+  (println "Usage : ./dt.clj <command>")
+  (println "Supported commands :")
+  (run! (fn [[k v]] (println (str "- " (name k) " -> " v))) commands))
 
 (defn beholder-clean []
   (println "-----------------------------")
