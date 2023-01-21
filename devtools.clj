@@ -47,36 +47,35 @@
   (shell "docker build . -t beholder:dev -f Dockerfile.dev"))
 
 (defmulti command identity)
-(defmethod command :default [command] (print-help))
-(defmethod command :help [command] (print-help))
-(defmethod command :init-dev [command] (do
+(defmethod command :default [_] (print-help))
+(defmethod command :help [_] (print-help))
+(defmethod command :init-dev [_] (do
+                                   (shell "clear")
+                                   (println "-----------------------------")
+                                   (println "initializing dev env")
+                                   (println "-----------------------------")
+                                   (println "MAKE SURE TO RUN:")
+                                   (println "eval $(minikube docker-env)")
+                                   (println "-----------------------------")
+                                   (shell "minikube start --driver=docker")
+                                   (safe-shell "kubectl proxy --port=8080 &")))
+
+(defmethod command :build-beholder [_] (do
                                          (shell "clear")
-                                         (println "-----------------------------")
-                                         (println "initializing dev env")
-                                         (println "-----------------------------")
-                                         (println "MAKE SURE TO RUN:")
-                                         (println "eval $(minikube docker-env)")
-                                         (println "-----------------------------")
-                                         (shell "minikube start --driver=docker")
-                                         (safe-shell "kubectl proxy --port=8080 &")))
+                                         (beholder-build)))
 
-(defmethod command :build-beholder [command] (do
-                                               (shell "clear")
-                                               (beholder-build)))
-
-(defmethod command :deploy-beholder [command] (do
-                                                (shell "clear")
-                                                (k8s-clean)
-                                                (shell "sleep 3")
-                                                (beholder-clean)
-                                                (beholder-build)
-                                                (shell "kubectl create deployment beholder --image=beholder:dev")
-                                                (shell "kubectl expose deployment beholder --type=LoadBalancer --port=3000")
-                                                (shell "sleep 3")
-                                                (println "-----------------------------")
-                                                (println "beholder can be found under url: ")
-                                                (shell "minikube service beholder --url")))
-
+(defmethod command :deploy-beholder [_] (do
+                                          (shell "clear")
+                                          (k8s-clean)
+                                          (shell "sleep 3")
+                                          (beholder-clean)
+                                          (beholder-build)
+                                          (shell "kubectl create deployment beholder --image=beholder:dev")
+                                          (shell "kubectl expose deployment beholder --type=LoadBalancer --port=3000")
+                                          (shell "sleep 3")
+                                          (println "-----------------------------")
+                                          (println "beholder can be found under url: ")
+                                          (shell "minikube service beholder --url")))
 
 ; -----------------------------------------------------------------------
 
