@@ -50,6 +50,25 @@ k8s-clean() {
   echo '-----------------------------------------------'
 }
 
+k8s-deploy-asyncapi-generator() {
+  echo '-----------------------------------------------'
+  echo 'DEPLOYING '
+  eval $(minikube docker-env)
+  k8s-clean
+  sleep 3
+  docker-clean
+  docker-build
+  kubectl create deployment beholder --image=beholder:1.0.0
+  kubectl expose deployment beholder --type=LoadBalancer --port=3000
+  echo '==============================================='
+  echo 'Image build and deployed to minikube. You can access is under'
+  sleep 3
+  minikube service beholder --url
+  echo '==============================================='
+  echo 'DONE'
+  echo '-----------------------------------------------'
+}
+
 k8s-deploy() {
   echo '-----------------------------------------------'
   echo 'DEPLOYING TO MINIKUBE'
