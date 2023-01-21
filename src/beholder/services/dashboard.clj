@@ -1,4 +1,4 @@
-(ns beholder.dashboard
+(ns beholder.services.dashboard
   (:require [beholder.model :as m]
             [beholder.repositories.config :as conf]
             [beholder.repositories.k8s :as k8s]))
@@ -12,6 +12,8 @@
     (conf/list-service-configs)
     (map convert-to-key-value)
     (into {})))
+
+; ---------------------------------------------------------------------
 
 (defn list-services! []
   (let [service-configs-map (get-service-configs-map)

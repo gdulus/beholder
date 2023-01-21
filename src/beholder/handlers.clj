@@ -1,8 +1,8 @@
-(ns beholder.main
-  (:require [beholder.dashboard :as dashboard]
-            [beholder.model :as m]
+(ns beholder.handlers
+  (:require [beholder.model :as m]
             [beholder.repositories.config :as conf]
             [beholder.repositories.k8s :as k8s]
+            [beholder.services.dashboard :as dashboard]
             [beholder.template :as tmpl]
             [clj-http.client :as client]
             [clojure.string :refer [split]]
@@ -13,9 +13,7 @@
             [taoensso.timbre :as log]))
 
 
-; ---------------------------------------------------------------
-
-(defn- get-openapi-status [openapi-doc-url]
+(defn get-openapi-status [openapi-doc-url]
   (try
     (case (:status (client/head openapi-doc-url {:throw-exceptions false}))
       200 :ok
@@ -24,45 +22,21 @@
     (catch Exception e
       :error)))
 
+; ---------------------------------------------------------------
+
 (defroutes app-routes
            (route/resources "/static")
+
+           ;; ------------------------------------------------------------
+           ;; DASHBOARD
+           ;; ------------------------------------------------------------
 
            (GET "/" []
              (ok (tmpl/html "dashboard.html"
                             {:services (dashboard/list-services!)})))
 
            ;; ------------------------------------------------------------
-
-           (context "/service/:id" [id]
-
-             (GET "/config" [status]
-               (let [beholder-conf (conf/get-beholder-config!)
-                     service-conf (conf/get-service-config id)
-                     k8s-service (k8s/get-service! id)
-                     api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)
-                     api-doc-status (get-openapi-status api-doc-url)]
-                 (ok (tmpl/html "service-config.html"
-                                {:service        k8s-service
-                                 :data           service-conf
-                                 :api-doc-url    api-doc-url
-                                 :api-doc-status api-doc-status
-                                 :status         status}))))
-
-             (POST "/config" [openApiPath team repo description]
-               (as->
-                 (m/->ServiceConfig id openApiPath team repo description) v
-                 (conf/save-service-config! v)
-                 (str "/service/" id "/config?status=success")
-                 (moved-permanently v)))
-
-             (GET "/openapi" [id]
-               (let [beholder-conf (conf/get-beholder-config!)
-                     service-conf (conf/get-service-config id)
-                     k8s-service (k8s/get-service! id)
-                     api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)]
-                 (log/info "Requesting OpenAPI doc from" api-doc-url)
-                 (client/get api-doc-url))))
-
+           ;; GLOBAL CONFIG
            ;; ------------------------------------------------------------
 
            (context "/config" []
@@ -82,11 +56,50 @@
                  (tmpl/html "beholder-config.html")
                  (ok))))
 
-           ; ------------------------------------------------------------
+           ;; ------------------------------------------------------------
+           ;; SERVICE CONFIG
+           ;; ------------------------------------------------------------
 
-           (GET "/doc/openapi/:id" [id]
-             (ok (tmpl/html "swagger-ui.html" {:id id})))
+           (context "/service/:id" [id]
+             (GET "/config" [status]
+               (let [beholder-conf (conf/get-beholder-config!)
+                     service-conf (conf/get-service-config id)
+                     k8s-service (k8s/get-service! id)
+                     api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)
+                     api-doc-status (get-openapi-status api-doc-url)]
+                 (ok (tmpl/html "service-config.html"
+                                {:service        k8s-service
+                                 :data           service-conf
+                                 :api-doc-url    api-doc-url
+                                 :api-doc-status api-doc-status
+                                 :status         status}))))
 
+             (POST "/config" [openApiPath team repo description]
+               (as->
+                 (m/->ServiceConfig id openApiPath team repo description) v
+                 (conf/save-service-config! v)
+                 (str "/service/" id "/config?status=success")
+                 (moved-permanently v))))
+
+           ;; ------------------------------------------------------------
+           ;; DOCUMENTATION RENDERING - OPENAPI
+           ;; ------------------------------------------------------------
+
+           (context "/service/:id/doc/openapi" [id]
+             (GET "/" []
+                  (ok (tmpl/html "openapi-ui.html" {:id id})))
+
+             (GET "/proxy" []
+                  (let [beholder-conf (conf/get-beholder-config!)
+                        service-conf (conf/get-service-config id)
+                        k8s-service (k8s/get-service! id)
+                        api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)]
+                    (log/info "Requesting OpenAPI doc from" api-doc-url)
+                    (client/get api-doc-url))))
+
+           ;; ------------------------------------------------------------
+           ;; OTHER
+           ;; ------------------------------------------------------------
 
            (ANY "*" [] (not-found "404")))
 

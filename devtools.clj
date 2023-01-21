@@ -6,7 +6,8 @@
 
 (def commands {:init-dev        "Init dev env"
                :build-beholder  "Build beholder docker image"
-               :deploy-beholder "Deploy beholder to local K8S"})
+               :deploy-beholder "Deploy beholder to local K8S"
+               :start-beholder  "Start beholder app"})
 
 (defn safe-shell [cmd]
   (try
@@ -75,6 +76,14 @@
                                           (println "-----------------------------")
                                           (println "beholder can be found under url: ")
                                           (shell "minikube service beholder --url")))
+
+(defmethod command :start-beholder [_] (do
+                                         (shell "clear")
+                                         (println "-----------------------------")
+                                         (println "starting beholder app")
+                                         (println "-----------------------------")
+                                         (shell "lein clean")
+                                         (shell "lein ring server")))
 
 ; -----------------------------------------------------------------------
 

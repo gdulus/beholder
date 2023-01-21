@@ -34,6 +34,6 @@
             [lein-environ "1.2.0"]                          ; make sure to change intellij repl run options to "run it with lein"
             [lein-ring "0.12.6"]
             [lein-eftest "0.6.0"]]
-  :repl-options {:init-ns beholder.main}
-  :ring {:handler beholder.main/app
+  :repl-options {:init-ns beholder.handlers}
+  :ring {:handler beholder.handlers/app
          :nrepl   {:start? true :port 41111}})

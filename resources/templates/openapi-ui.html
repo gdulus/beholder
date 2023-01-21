@@ -10,7 +10,7 @@
 <script>
 window.onload = function() {
   const ui = SwaggerUIBundle({
-    url: "/service/{{id}}/openapi",
+    url: "/service/{{id}}/doc/openapi/proxy",
     dom_id: '#swagger-ui',
     supportedSubmitMethods: [],
     presets: [
@@ -18,9 +18,7 @@ window.onload = function() {
       SwaggerUIStandalonePreset
     ]
   })
-
   window.ui = ui
 }
-
 </script>
 {% endblock %}
