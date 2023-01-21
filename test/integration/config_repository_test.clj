@@ -1,4 +1,4 @@
-(ns beholder.repositories.config-test
+(ns integration.config-repository-test
   (:require [beholder.model :as m]
             [beholder.repositories.config :as r]
             [clj-test-containers.core :as tc]
@@ -19,7 +19,7 @@
 (defn build-mocked-es-config [container]
   {:hosts [(str "http://" (:host container) ":" (get (:mapped-ports container) 9200))]})
 
-(deftest ^:eftest/synchronized ^:integration update-config-test
+(deftest ^:integration update-config-test
   (let [container (start-container)]
     (with-redefs [beholder.repositories.config/config (fn [] (build-mocked-es-config container))]
 

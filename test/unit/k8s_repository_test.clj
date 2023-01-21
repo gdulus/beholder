@@ -1,4 +1,4 @@
-(ns beholder.repositories.k8s-test
+(ns unit.k8s-repository-test
   (:require [beholder.model :as m]
             [beholder.repositories.k8s :refer [list-services!]]
             [clojure.test :refer :all]))

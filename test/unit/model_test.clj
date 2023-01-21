@@ -1,4 +1,4 @@
-(ns beholder.model-test
+(ns unit.model-test
   (:require [beholder.model :as m]
             [clojure.test :refer :all]))
 
@@ -41,6 +41,4 @@
     (is (= "http://test.com/api/local.openapi.yml"
            (m/get-openapi-url (m/map->BeholderConfig {})
                               (m/map->KubernetesService {:url "http://test.com"})
-                              (m/map->ServiceConfig {:openApiPath "//api///local.openapi.yml"}))))
-
-    ))
+                              (m/map->ServiceConfig {:openApiPath "//api///local.openapi.yml"}))))))

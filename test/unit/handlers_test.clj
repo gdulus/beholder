@@ -1,4 +1,4 @@
-(ns beholder.handlers-test
+(ns unit.handlers-test
   (:require [beholder.handlers :as routes]
             [beholder.model :as m]
             [clojure.string :as str]
