@@ -61,7 +61,7 @@
                      api-doc-status (remote-resource-exists? api-doc-url)
                      openapi-label (m/get-openapi-label beholder-conf)
                      openapi-supported? (contains? (:labels k8s-service) openapi-label)
-                     asyncapi-label "asyncapi"
+                     asyncapi-label (m/get-asyncapi-label beholder-conf)
                      asyncapi-supported? (contains? (:labels k8s-service) asyncapi-label)]
                  (ok (tmpl/html "service-config.html"
                                 {:service             k8s-service
@@ -71,7 +71,7 @@
                                  :status              status
                                  :openapi-label       (name openapi-label)
                                  :openapi-supported?  openapi-supported?
-                                 :asyncapi-label      asyncapi-label
+                                 :asyncapi-label      (name asyncapi-label)
                                  :asyncapi-supported? asyncapi-supported?}))))
 
              (POST "/config" [openApiPath team repo description]
