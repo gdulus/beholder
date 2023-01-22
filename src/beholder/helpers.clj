@@ -10,12 +10,12 @@
       404 :not-found
       :error)
     (catch Throwable e
-      (log/error "Error while checking resource" e)
+      (log/warn "Error while checking resource" e)
       :error)))
 
 (defn fetch-remote-resource [url]
   (try
     (client/get url)
     (catch Throwable e
-      (log/error "Error while loading resource" e)
+      (log/warn "Error while loading resource" e)
       "")))

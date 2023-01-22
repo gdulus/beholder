@@ -7,12 +7,17 @@
 (def commands {:init-dev        "Init dev env"
                :build-beholder  "Build beholder docker image"
                :deploy-beholder "Deploy beholder to local K8S"
-               :start-beholder  "Start beholder app"})
+               :start-beholder  "Start beholder app"
+               :build-mock      "Build mock service docker image"
+               :deploy-mock     "Deploy mock to local K8S"})
 
-(defn safe-shell [cmd]
-  (try
-    (shell cmd)
-    (catch Exception _)))
+(defn safe-shell
+  ([cmd] (try
+           (shell cmd)
+           (catch Exception _)))
+  ([options cmd] (try
+           (shell options cmd)
+           (catch Exception _))))
 
 (defn what-to-do-dialog []
   (menu "BEHOLDER DEV TOOLS" "What do you want to do?" commands))
@@ -45,6 +50,15 @@
   (shell "lein clean")
   (shell "lein ring uberjar")
   (shell "docker build . -t beholder:dev -f Dockerfile.dev"))
+
+(defn mock-docu-service-build []
+  (println "-----------------------------")
+  (println "building mock service")
+  (println "-----------------------------")
+  (shell {:dir "utils/mock-docu-service"} "lein clean")
+  (shell {:dir "utils/mock-docu-service"} "lein ring uberjar")
+  (shell {:dir "utils/mock-docu-service"} "docker build . -t mock-docu-service:dev -f Dockerfile"))
+
 
 (defmulti command identity)
 (defmethod command :default [_] (print-help))
@@ -84,6 +98,47 @@
                                          (println "-----------------------------")
                                          (shell "lein clean")
                                          (shell "lein ring server")))
+
+(defmethod command :build-mock [_] (do
+                                     (shell "clear")
+                                     (mock-docu-service-build)))
+
+(defmethod command :deploy-mock [_] (do
+                                      (shell "clear")
+                                      (println "-----------------------------")
+                                      (println "removing mock from docker repo")
+                                      (println "-----------------------------")
+                                      (safe-shell "docker rm mock-docu-service")
+                                      (safe-shell "docker image rm mock-docu-service:dev")
+
+                                      (println "-----------------------------")
+                                      (println "removing mocks from k8s")
+                                      (println "-----------------------------")
+                                      (safe-shell "kubectl delete deployment mock-docu-openapi")
+                                      (safe-shell "kubectl delete service mock-docu-openapi")
+                                      (safe-shell "kubectl delete deployment mock-docu-asyncapi")
+                                      (safe-shell "kubectl delete service mock-docu-asyncapi")
+                                      (safe-shell "kubectl delete deployment mock-docu-both")
+                                      (safe-shell "kubectl delete service mock-docu-both")
+
+                                      (mock-docu-service-build)
+
+                                      (println "-----------------------------")
+                                      (println "deploying mocks to k8s")
+                                      (println "-----------------------------")
+                                      (shell "kubectl create deployment mock-docu-openapi --image=mock-docu-service:dev")
+                                      (shell "kubectl expose deployment mock-docu-openapi --type=LoadBalancer --port=3000")
+                                      (shell "kubectl label service mock-docu-openapi openapi=true")
+
+                                      (shell "kubectl create deployment mock-docu-asyncapi --image=mock-docu-service:dev")
+                                      (shell "kubectl expose deployment mock-docu-asyncapi --type=LoadBalancer --port=3000")
+                                      (shell "kubectl label service mock-docu-asyncapi asyncapi=true")
+
+                                      (shell "kubectl create deployment mock-docu-both --image=mock-docu-service:dev")
+                                      (shell "kubectl expose deployment mock-docu-both --type=LoadBalancer --port=3000")
+                                      (shell "kubectl label service mock-docu-both openapi=true")
+                                      (shell "kubectl label service mock-docu-both asyncapi=true")))
+
 
 ; -----------------------------------------------------------------------
 

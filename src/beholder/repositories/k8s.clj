@@ -17,9 +17,11 @@
                     :action  :list
                     :request {:namespace n}}))
 
-(defn- valid-service? [openapi-label list-resource]
-  (and (some? (get-in list-resource [:spec :selector :app]))
-       (contains? (get-in list-resource [:metadata :labels]) (keyword openapi-label))))
+(defn- valid-service? [openapi-label asyncapi-label list-resource]
+  (let [labels (get-in list-resource [:metadata :labels])]
+    (and (some? (get-in list-resource [:spec :selector :app]))
+         (or (contains? labels openapi-label)
+             (contains? labels asyncapi-label)))))
 
 (defn- get-port [list-resource]
   (->> (get-in list-resource [:spec :ports])
@@ -43,11 +45,12 @@
 (defn list-services! []
   (let [config (c/get-beholder-config!)
         openapi-label (log/spy :info "OpenAPI K8S label" (m/get-openapi-label config))
+        asyncapi-label (log/spy :info "AsyncAPI K8S label" (m/get-asyncapi-label config))
         namespaces (log/spy :info "Namespaces to scan" (m/get-namespaces config))]
     (->>
       (map load-k8s-services namespaces)
       (mapcat :items)
-      (filter #(valid-service? openapi-label %))
+      (filter #(valid-service? openapi-label asyncapi-label %))
       (map response->KubernetesService)
       (map validate-KubernetesService))))
 
