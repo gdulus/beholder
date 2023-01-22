@@ -78,9 +78,9 @@
                                             :supported? asyncapi-supported?
                                             :status     (when asyncapi-supported? (remote-resource-exists? asyncapi-url))}}))))
 
-             (POST "/config" [openApiPath team repo description]
+             (POST "/config" [openApiPath asyncApiPath team repo description]
                (as->
-                 (m/->ServiceConfig id openApiPath team repo description) v
+                 (m/->ServiceConfig id openApiPath asyncApiPath team repo description) v
                  (conf/save-service-config! v)
                  (str "/service/" id "/config?status=success")
                  (moved-permanently v))))

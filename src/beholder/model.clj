@@ -53,6 +53,7 @@
 
 (s/defrecord ServiceConfig [serviceId :- s/Str
                             openApiPath :- (s/maybe s/Str)
+                            asyncApiPath :- (s/maybe s/Str)
                             team :- (s/maybe s/Str)
                             repo :- (s/maybe s/Str)
                             description :- (s/maybe s/Str)])

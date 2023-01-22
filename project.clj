@@ -28,8 +28,7 @@
                  [ring/ring-mock "0.4.0"]
 
                  ;; --------------- logging ------------------------------
-                 [com.taoensso/timbre "6.0.4"]
-                 ]
+                 [com.taoensso/timbre "6.0.4"]]
   :plugins [
             [lein-environ "1.2.0"]                          ; make sure to change intellij repl run options to "run it with lein"
             [lein-ring "0.12.6"]

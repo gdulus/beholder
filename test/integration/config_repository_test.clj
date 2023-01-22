@@ -19,13 +19,54 @@
 (defn- build-mocked-es-config [container]
   {:hosts [(str "http://" (:host container) ":" (get (:mapped-ports container) 9200))]})
 
+(defn- wait []
+  (Thread/sleep 1000))
+
 ; -------------------------------------------------------------
 
-(deftest test-BeholderConfig-crud
+(deftest test-crud-operations
+
   (let [container (start-container)]
     (with-redefs [beholder.repositories.config/config (fn [] (build-mocked-es-config container))]
 
-      (testing "When update-config! executes successfully should return saved BeholderConfig"
+      (testing "When no ServiceConfig entries get-service-config should return nil"
+        (is (some? (r/create-indexes!)))
+        (is (nil? (r/get-service-config 123)))
+        (is (some? (r/delete-indexes!))))
+
+      (testing "When saved ServiceConfig get-service-config should return it"
+        (let [service-config (m/->ServiceConfig "123" "path/openapi" "path/asyncapi" "my team" "path/repo" "my description")]
+          (is (some? (r/create-indexes!)))
+          (is (= service-config (r/save-service-config! service-config)))
+          (wait)
+          (is (= service-config (r/get-service-config "123")))
+          (is (some? (r/delete-indexes!)))))
+
+      (testing "When saved ServiceConfig list-service-configs should return without duplicates"
+        (let [sc1v1 (m/->ServiceConfig "1" "path/openapi1" "path/asyncapi1" "my team1" "path/repo1" "my description1")
+              sc1v2 (m/->ServiceConfig "1" "path/openapi1v2" "path/asyncapi1v2" "my team1v2" "path/repo1v2" "my description1v2")
+              sc2v1 (m/->ServiceConfig "2" "path/openapi2" "path/asyncapi2" "my team2" "path/repo2" "my description2")]
+          (is (some? (r/create-indexes!)))
+
+          (is (= sc1v1 (r/save-service-config! sc1v1)))
+          (wait)
+          (is (= 1 (count (r/list-service-configs))))
+
+          (is (= sc2v1 (r/save-service-config! sc2v1)))
+          (wait)
+          (is (= 2 (count (r/list-service-configs))))
+
+          (is (= sc1v2 (r/save-service-config! sc1v2)))
+          (wait)
+          (is (= 2 (count (r/list-service-configs))))
+          (is (= sc1v2 (first (filter #(= (:serviceId %) "1") (r/list-service-configs)))))
+          (is (= sc2v1 (first (filter #(= (:serviceId %) "2") (r/list-service-configs)))))
+
+          (is (some? (r/delete-indexes!)))))
+
+      ; -----------
+
+      (testing "When save-beholder-config! executes successfully should return saved BeholderConfig"
         (is (some? (r/create-indexes!)))
         (is (= (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"],
                                    "openApiLabel_1"
@@ -39,19 +80,19 @@
                                                             "my/path/2"))))
         (is (some? (r/delete-indexes!))))
 
-      (testing "When no BeholderConfig entries get-config! should return nil"
+      (testing "When no BeholderConfig entries get-beholder-config! should return nil"
         (is (some? (r/create-indexes!)))
         (is (nil? (r/get-beholder-config!)))
         (is (some? (r/delete-indexes!))))
 
-      (testing "When one BeholderConfig entry get-config! should return it"
+      (testing "When one BeholderConfig entry get-beholder-config! should return it"
         (is (some? (r/create-indexes!)))
         (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"]
                                                                 "openApiLabel_1"
                                                                 "my/path/1"
                                                                 "asyncApiLabel_1"
                                                                 "my/path/2"))))
-        (Thread/sleep 1000)
+        (wait)
         (is (= (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"]
                                    "openApiLabel_1"
                                    "my/path/1"
@@ -60,7 +101,7 @@
                (r/get-beholder-config!)))
         (is (some? (r/delete-indexes!))))
 
-      (testing "When more than one BeholderConfig entries get-config! should return the latest one"
+      (testing "When more than one BeholderConfig entries get-beholder-config! should return the latest one"
         (is (some? (r/create-indexes!)))
         (is (some? (r/save-beholder-config! (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"]
                                                                 "openApiLabel_1"
@@ -82,7 +123,7 @@
                                                                 "my/path/4"
                                                                 "asyncApiLabel_4"
                                                                 "my/async/4"))))
-        (Thread/sleep 1000)
+        (wait)
         (is (= (m/->BeholderConfig ["namespace_1" "namespace_2" "namespace_3"]
                                    "openApiLabel_4"
                                    "my/path/4"
