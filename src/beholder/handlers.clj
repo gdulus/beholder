@@ -57,22 +57,26 @@
                (let [beholder-conf (conf/get-beholder-config!)
                      service-conf (conf/get-service-config id)
                      k8s-service (k8s/get-service! id)
-                     api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)
-                     api-doc-status (remote-resource-exists? api-doc-url)
+                     ; ----------
+                     openapi-url (m/get-openapi-url beholder-conf k8s-service service-conf)
                      openapi-label (m/get-openapi-label beholder-conf)
                      openapi-supported? (contains? (:labels k8s-service) openapi-label)
+                     ; ----------
+                     asyncapi-url (m/get-asyncapi-url beholder-conf k8s-service service-conf)
                      asyncapi-label (m/get-asyncapi-label beholder-conf)
                      asyncapi-supported? (contains? (:labels k8s-service) asyncapi-label)]
                  (ok (tmpl/html "service-config.html"
-                                {:service             k8s-service
-                                 :data                service-conf
-                                 :api-doc-url         api-doc-url
-                                 :api-doc-status      api-doc-status
-                                 :status              status
-                                 :openapi-label       (name openapi-label)
-                                 :openapi-supported?  openapi-supported?
-                                 :asyncapi-label      (name asyncapi-label)
-                                 :asyncapi-supported? asyncapi-supported?}))))
+                                {:status   status
+                                 :service  k8s-service
+                                 :data     service-conf
+                                 :openapi  {:url        openapi-url
+                                            :label      (name openapi-label)
+                                            :supported? openapi-supported?
+                                            :status     (when openapi-supported? (remote-resource-exists? openapi-url))}
+                                 :asyncapi {:url        asyncapi-url
+                                            :label      (name asyncapi-label)
+                                            :supported? asyncapi-supported?
+                                            :status     (when asyncapi-supported? (remote-resource-exists? asyncapi-url))}}))))
 
              (POST "/config" [openApiPath team repo description]
                (as->

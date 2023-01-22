@@ -76,3 +76,8 @@
   (str (:url k8s-service-conf) "/" (if (not (str/blank? (:openApiPath service-conf)))
                                      (sanitize-path (:openApiPath service-conf))
                                      (sanitize-path (get-openapi-path beholder-config)))))
+
+(defn get-asyncapi-url [beholder-config k8s-service-conf service-conf]
+  (str (:url k8s-service-conf) "/" (if (not (str/blank? (:asyncApiPath service-conf)))
+                                     (sanitize-path (:asyncApiPath service-conf))
+                                     (sanitize-path (get-asyncapi-path beholder-config)))))

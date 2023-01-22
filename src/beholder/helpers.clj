@@ -9,13 +9,13 @@
       200 :found
       404 :not-found
       :error)
-    (catch Throwable e
-      (log/warn "Error while checking resource" e)
+    (catch Exception e
+      (log/warn "Error while checking resource")
       :error)))
 
 (defn fetch-remote-resource [url]
   (try
     (client/get url)
-    (catch Throwable e
-      (log/warn "Error while loading resource" e)
+    (catch Exception e
+      (log/warn "Error while loading resource")
       "")))

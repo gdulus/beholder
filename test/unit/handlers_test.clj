@@ -27,14 +27,17 @@
 
 (deftest test-service_id_config-route
 
-  (testing "Test service/:id/config route - OpenAPI disabled"
+  (testing "Test service/:id/config route - disabled services"
     (with-redefs [beholder.repositories.config/get-beholder-config! (fn [] (m/map->BeholderConfig {}))
                   beholder.repositories.config/get-service-config (fn [_] (m/map->ServiceConfig {:openApiPath "/gdulus/beholder/main/test/empty.json"}))
                   beholder.repositories.k8s/get-service! (fn [_] (m/map->KubernetesService {:url    "https://raw.githubusercontent.com"
                                                                                             :labels {}}))]
       (let [response (routes/app-routes (mock/request :get "/service/12345678/config"))]
         (is (str/includes? (:body response) "To enable OpenAPI docu mark service with \"openapi\" label."))
+        (is (str/includes? (:body response) "To enable AsyncAPI docu mark service with \"asyncapi\" label."))
         (is (= 200 (:status response))))))
+
+  ; ---
 
   (testing "Test service/:id/config route - OpenAPI file check -> file exists"
     (with-redefs [beholder.repositories.config/get-beholder-config! (fn [] (m/map->BeholderConfig {}))
@@ -42,6 +45,7 @@
                   beholder.repositories.k8s/get-service! (fn [_] (m/map->KubernetesService {:url    "https://raw.githubusercontent.com"
                                                                                             :labels {:openapi true}}))]
       (let [response (routes/app-routes (mock/request :get "/service/12345678/config"))]
+        (is (str/includes? (:body response) "To enable AsyncAPI docu mark service with \"asyncapi\" label."))
         (is (str/includes? (:body response) "File found"))
         (is (= 200 (:status response))))))
 
@@ -51,6 +55,8 @@
                   beholder.repositories.k8s/get-service! (fn [_] (m/map->KubernetesService {:url    "https://raw.githubusercontent.com"
                                                                                             :labels {:openapi true}}))]
       (let [response (routes/app-routes (mock/request :get "/service/12345678/config"))]
+        (is (str/includes? (:body response) "To enable AsyncAPI docu mark service with \"asyncapi\" label."))
+        (is (str/includes? (:body response) "https://raw.githubusercontent.com/gdulus/beholder/main/test/not-exists.json"))
         (is (str/includes? (:body response) "File not found"))
         (is (= 200 (:status response))))))
 
@@ -59,13 +65,40 @@
                   beholder.repositories.config/get-service-config (fn [_] (m/map->ServiceConfig {}))
                   beholder.repositories.k8s/get-service! (fn [_] (m/map->KubernetesService {:labels {:openapi true}}))]
       (let [response (routes/app-routes (mock/request :get "/service/12345678/config"))]
+        (is (str/includes? (:body response) "To enable AsyncAPI docu mark service with \"asyncapi\" label."))
         (is (str/includes? (:body response) "Error while checking for the file"))
         (is (= 200 (:status response))))))
 
-  (testing "Test service/:id/config route - AsyncAPI disabled"
+  ; ---
+
+  (testing "Test service/:id/config route - AsyncAPI file check -> file exists"
+    (with-redefs [beholder.repositories.config/get-beholder-config! (fn [] (m/map->BeholderConfig {}))
+                  beholder.repositories.config/get-service-config (fn [_] (m/map->ServiceConfig {:asyncApiPath "/gdulus/beholder/main/test/empty.json"}))
+                  beholder.repositories.k8s/get-service! (fn [_] (m/map->KubernetesService {:url    "https://raw.githubusercontent.com"
+                                                                                            :labels {:asyncapi true}}))]
+      (let [response (routes/app-routes (mock/request :get "/service/12345678/config"))]
+        (is (str/includes? (:body response) "To enable OpenAPI docu mark service with \"openapi\" label."))
+        (is (str/includes? (:body response) "File found"))
+        (is (= 200 (:status response))))))
+
+  (testing "Test service/:id/config route - AsyncAPI file check -> file not exists"
+    (with-redefs [beholder.repositories.config/get-beholder-config! (fn [] (m/map->BeholderConfig {}))
+                  beholder.repositories.config/get-service-config (fn [_] (m/map->ServiceConfig {:asyncApiPath "/gdulus/beholder/main/test/not-exists.json"}))
+                  beholder.repositories.k8s/get-service! (fn [_] (m/map->KubernetesService {:url    "https://raw.githubusercontent.com"
+                                                                                            :labels {:asyncapi true}}))]
+      (let [response (routes/app-routes (mock/request :get "/service/12345678/config"))]
+        (is (str/includes? (:body response) "To enable OpenAPI docu mark service with \"openapi\" label."))
+        (is (str/includes? (:body response) "https://raw.githubusercontent.com/gdulus/beholder/main/test/not-exists.json"))
+        (is (str/includes? (:body response) "File not found"))
+        (is (= 200 (:status response))))))
+
+  (testing "Test service/:id/config route - AsyncAPI file check -> error while checking for the file"
     (with-redefs [beholder.repositories.config/get-beholder-config! (fn [] (m/map->BeholderConfig {}))
                   beholder.repositories.config/get-service-config (fn [_] (m/map->ServiceConfig {}))
-                  beholder.repositories.k8s/get-service! (fn [_] (m/map->KubernetesService {}))]
+                  beholder.repositories.k8s/get-service! (fn [_] (m/map->KubernetesService {:labels {:asyncapi true}}))]
       (let [response (routes/app-routes (mock/request :get "/service/12345678/config"))]
-        (is (str/includes? (:body response) "To enable AsyncAPI docu mark service with \"asyncapi\" label."))
-        (is (= 200 (:status response)))))))
+        (is (str/includes? (:body response) "To enable OpenAPI docu mark service with \"openapi\" label."))
+        (is (str/includes? (:body response) "Error while checking for the file"))
+        (is (= 200 (:status response))))))
+
+  )

@@ -15,7 +15,7 @@
                 <br/>
 
                 <form method="post" action="/service/{{service.id}}/config">
-                    {% if openapi-supported? %}
+                    {% if openapi.supported? %}
                     <div class="py-3 border-top">
                         <h5>OpenAPI config</h5>
                         <div class="mb-3">
@@ -31,13 +31,13 @@
                             <table>
                                 <tr>
                                     <td>current URL:</td>
-                                    <td class="px-3"><span class="badge text-bg-secondary">{{api-doc-url}}</span></td>
+                                    <td class="px-3"><span class="badge text-bg-secondary">{{openapi.url}}</span></td>
                                 </tr>
                                 <tr>
                                     <td>status:</td>
-                                    <td class="px-3">{% if api-doc-status = :found %}
+                                    <td class="px-3">{% if openapi.status = :found %}
                                         <span class="badge text-bg-success">File found</span>
-                                        {% elif api-doc-status = :not-found %}
+                                        {% elif openapi.status = :not-found %}
                                         <span class="badge text-bg-danger">File not found</span>
                                         {% else %}
                                         <span class="badge text-bg-danger">Error while checking for the file</span>
@@ -52,12 +52,12 @@
                     <div class="py-3 border-top">
                         <h5 class="text-secondary">OpenAPI config</h5>
                         <div class="form-text">
-                            To enable OpenAPI docu mark service with "{{openapi-label}}" label.
+                            To enable OpenAPI docu mark service with "{{openapi.label}}" label.
                         </div>
                     </div>
                     {% endif %}
 
-                    {% if asyncapi-supported? %}
+                    {% if asyncapi.supported? %}
                     <div class="py-3 border-top">
                         <h5>AsyncAPI config</h5>
                         <div class="mb-3">
@@ -73,13 +73,13 @@
                             <table>
                                 <tr>
                                     <td>current URL:</td>
-                                    <td class="px-3"><span class="badge text-bg-secondary">{{api-doc-url}}</span></td>
+                                    <td class="px-3"><span class="badge text-bg-secondary">{{asyncapi.url}}</span></td>
                                 </tr>
                                 <tr>
                                     <td>status:</td>
-                                    <td class="px-3">{% if api-doc-status = :found %}
+                                    <td class="px-3">{% if asyncapi.status = :found %}
                                         <span class="badge text-bg-success">File found</span>
-                                        {% elif api-doc-status = :not-found %}
+                                        {% elif asyncapi.status = :not-found %}
                                         <span class="badge text-bg-danger">File not found</span>
                                         {% else %}
                                         <span class="badge text-bg-danger">Error while checking for the file</span>
@@ -94,7 +94,7 @@
                     <div class="py-3 border-top">
                         <h5 class="text-secondary">AsyncAPI config</h5>
                         <div class="form-text">
-                            To enable AsyncAPI docu mark service with "{{asyncapi-label}}" label.
+                            To enable AsyncAPI docu mark service with "{{asyncapi.label}}" label.
                         </div>
                     </div>
                     {% endif %}
