@@ -1,8 +1,7 @@
 #!/usr/bin/env bb
 
 (require '[bb-dialog.core :refer :all]
-         '[clojure.string :as str]
-         '[babashka.process :refer [shell process check sh pipeline pb]])
+         '[babashka.process :refer [shell]])
 
 (def commands {:init-dev        "Init dev env"
                :build-beholder  "Build beholder docker image"
