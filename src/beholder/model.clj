@@ -19,7 +19,7 @@
 
 ; --------------------------------------------------------------
 
-(defprotocol GlobalConfigAware
+(defprotocol DefaultValuesAware
   (get-namespaces [x])
   (get-openapi-label [x])
   (get-openapi-path [x])
@@ -31,7 +31,7 @@
                              openApiPath :- (s/maybe s/Str)
                              asyncApiLabel :- (s/maybe s/Str)
                              asyncApiPath :- (s/maybe s/Str)]
-  GlobalConfigAware
+  DefaultValuesAware
 
   (get-namespaces [x]
     (let [namespaces (remove str/blank? namespaces)]
