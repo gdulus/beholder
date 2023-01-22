@@ -3,9 +3,11 @@
             [schema.core :as s]))
 
 (def ^:private url (s/pred #(re-matches #"(www|http:|https:)+[^\s]+[\w]" %)))
+(def ^:private ^:const default-namespace ["default"])
 (def ^:private ^:const default-openapi-label :openapi)
 (def ^:private ^:const default-openapi-path "api/openapi.yml")
-(def ^:private ^:const default-namespace ["default"])
+(def ^:private ^:const default-asyncpi-label :asyncapi)
+(def ^:private ^:const default-asyncapi-path "api/asyncapi.yml")
 
 ; --------------------------------------------------------------
 
@@ -20,7 +22,9 @@
 (defprotocol GlobalConfigAware
   (get-namespaces [x])
   (get-openapi-label [x])
-  (get-openapi-path [x]))
+  (get-openapi-path [x])
+  (get-asyncapi-label [x])
+  (get-asyncapi-path [x]))
 
 (s/defrecord BeholderConfig [namespaces :- (s/maybe [s/Str])
                              openApiLabel :- (s/maybe s/Str)
@@ -34,10 +38,16 @@
       (if (empty? namespaces) default-namespace namespaces)))
 
   (get-openapi-label [x]
-    (if (str/blank? openApiLabel) default-openapi-label openApiLabel))
+    (if (str/blank? openApiLabel) default-openapi-label (keyword openApiLabel)))
 
   (get-openapi-path [x]
-    (if (str/blank? openApiPath) default-openapi-path openApiPath)))
+    (if (str/blank? openApiPath) default-openapi-path openApiPath))
+
+  (get-asyncapi-label [x]
+    (if (str/blank? asyncApiLabel) default-asyncpi-label (keyword asyncApiLabel)))
+
+  (get-asyncapi-path [x]
+    (if (str/blank? asyncApiPath) default-asyncapi-path asyncApiPath)))
 
 ; --------------------------------------------------------------
 

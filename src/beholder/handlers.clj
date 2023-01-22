@@ -12,7 +12,6 @@
             [ring.util.http-response :refer :all]
             [taoensso.timbre :as log]))
 
-
 (defroutes app-routes
            (route/resources "/static")
 
@@ -59,13 +58,21 @@
                      service-conf (conf/get-service-config id)
                      k8s-service (k8s/get-service! id)
                      api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)
-                     api-doc-status (remote-resource-exists? api-doc-url)]
+                     api-doc-status (remote-resource-exists? api-doc-url)
+                     openapi-label (m/get-openapi-label beholder-conf)
+                     openapi-supported? (contains? (:labels k8s-service) openapi-label)
+                     asyncapi-label "asyncapi"
+                     asyncapi-supported? (contains? (:labels k8s-service) asyncapi-label)]
                  (ok (tmpl/html "service-config.html"
-                                {:service        k8s-service
-                                 :data           service-conf
-                                 :api-doc-url    api-doc-url
-                                 :api-doc-status api-doc-status
-                                 :status         status}))))
+                                {:service             k8s-service
+                                 :data                service-conf
+                                 :api-doc-url         api-doc-url
+                                 :api-doc-status      api-doc-status
+                                 :status              status
+                                 :openapi-label       (name openapi-label)
+                                 :openapi-supported?  openapi-supported?
+                                 :asyncapi-label      asyncapi-label
+                                 :asyncapi-supported? asyncapi-supported?}))))
 
              (POST "/config" [openApiPath team repo description]
                (as->

@@ -8,7 +8,24 @@
     (is (= (m/get-namespaces (m/->BeholderConfig [] "" "" "" "")) ["default"]))
     (is (= (m/get-namespaces (m/->BeholderConfig [""] "" "" "" "")) ["default"]))
     (is (= (m/get-namespaces (m/->BeholderConfig ["n1"] "" "" "" "")) ["n1"]))
-    (is (= (m/get-namespaces (m/->BeholderConfig ["n1" "n2"] "" "" "" "")) ["n1" "n2"]))))
+    (is (= (m/get-namespaces (m/->BeholderConfig ["n1" "n2"] "" "" "" "")) ["n1" "n2"])))
+
+  (testing "Test get-openapi-label"
+    (is (= (m/get-openapi-label (m/->BeholderConfig nil "" "" "" "")) :openapi))
+    (is (= (m/get-openapi-label (m/->BeholderConfig nil "custom" "" "" "")) :custom)))
+
+  (testing "Test get-openapi-path"
+    (is (= (m/get-openapi-path (m/->BeholderConfig nil "" "" "" "")) "api/openapi.yml"))
+    (is (= (m/get-openapi-path (m/->BeholderConfig nil "" "custom" "" "")) "custom")))
+
+  (testing "Test get-asyncapi-label"
+    (is (= (m/get-asyncapi-label (m/->BeholderConfig nil "" "" "" "")) :asyncapi))
+    (is (= (m/get-asyncapi-label (m/->BeholderConfig nil "" "" "custom" "")) :custom)))
+
+  (testing "Test get-asyncapi-path"
+    (is (= (m/get-asyncapi-path (m/->BeholderConfig nil "" "" "" "")) "api/asyncapi.yml"))
+    (is (= (m/get-asyncapi-path (m/->BeholderConfig nil "" "" "" "custom")) "custom"))))
+
 
 
 (deftest test-common-functions

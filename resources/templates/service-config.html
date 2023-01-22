@@ -11,64 +11,115 @@
             {% endif %}
 
             <div class="card p-5 mt-5 shadow">
-                <h5>Configuration of <span class="text-success">{{service.name}}</span> service</h5>
+                <h4>Configuration of <span class="text-success">{{service.name}}</span> service</h4>
                 <br/>
+
                 <form method="post" action="/service/{{service.id}}/config">
-                    <div class="mb-3">
-                        <label for="openApiPath" class="form-label">Service OpenAPI doc path</label>
-                        <input type="text" class="form-control" name="openApiPath" id="openApiPath"
-                               aria-describedby="openApiPathHelp" value="{{data.openApiPath}}">
-                        <div id="openApiPathHelp" class="form-text">
-                            Path under which OpenAPI doc is exposed by {{service.name}} service.
-                            When empty value from <a href="/config">global configuration</a> will be used.
+                    {% if openapi-supported? %}
+                    <div class="py-3 border-top">
+                        <h5>OpenAPI config</h5>
+                        <div class="mb-3">
+                            <label for="openApiPath" class="form-label">Service OpenAPI doc path</label>
+                            <input type="text" class="form-control" name="openApiPath" id="openApiPath"
+                                   aria-describedby="openApiPathHelp" value="{{data.openApiPath}}">
+                            <div id="openApiPathHelp" class="form-text">
+                                Path under which OpenAPI doc is exposed by {{service.name}} service.
+                                When empty value from <a href="/config">global configuration</a> will be used.
+                            </div>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="team" class="form-label">Current OpenAPI URL</label>
-                        <input disabled type="text" class="form-control" aria-describedby="teamHelp"
-                               value="{{api-doc-url}}">
-                    </div>
-                    <div class="mb-3">
-                        <label for="repo" class="form-label">OpenAPI file status: </label>
-                        {% if api-doc-status = :found %}
-                        <span class="badge text-bg-success">File found</span>
-                        {% elif api-doc-status = :not-found %}
-                        <span class="badge text-bg-danger">File not found</span>
-                        {% else %}
-                        <span class="badge text-bg-danger">Error while checking for the file</span>
-                        {% endif %}
+                        <div class="mb-3">
+                            <table>
+                                <tr>
+                                    <td>current URL:</td>
+                                    <td class="px-3"><span class="badge text-bg-secondary">{{api-doc-url}}</span></td>
+                                </tr>
+                                <tr>
+                                    <td>status:</td>
+                                    <td class="px-3">{% if api-doc-status = :found %}
+                                        <span class="badge text-bg-success">File found</span>
+                                        {% elif api-doc-status = :not-found %}
+                                        <span class="badge text-bg-danger">File not found</span>
+                                        {% else %}
+                                        <span class="badge text-bg-danger">Error while checking for the file</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
 
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="repo" class="form-label">Labels:</label>
-                        {% for label in service.labels %}
-                            <span class="badge text-bg-info">{{label}}</span>
-                        {% endfor %}
+                    {% else %}
+                    <div class="py-3 border-top">
+                        <h5 class="text-secondary">OpenAPI config</h5>
+                        <div class="form-text">To enable it mark service with "{{openapi-label}}" label.</div>
+                    </div>
+                    {% endif %}
 
-                    </div>
-                    <div class="mb-3">
-                        <label for="team" class="form-label">Team ownership</label>
-                        <input type="text" class="form-control" name="team" id="team"
-                               aria-describedby="teamHelp" value="{{data.team}}">
-                        <div id="teamHelp" class="form-text">
-                            Name of the team owning {{service.name}} service.
+                    {% if asyncapi-supported? %}
+                    <div class="py-3 border-top">
+                        <h5>AsyncAPI config</h5>
+                        <div class="mb-3">
+                            <label for="asyncApiPath" class="form-label">Service AsyncAPI doc path</label>
+                            <input type="text" class="form-control" name="asyncApiPath" id="asyncApiPath"
+                                   aria-describedby="asyncApiPathHelp" value="{{data.asyncApiPath}}">
+                            <div id="asyncApiPathHelp" class="form-text">
+                                Path under which AsyncAPI doc is exposed by {{service.name}} service.
+                                When empty value from <a href="/config">global configuration</a> will be used.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <table>
+                                <tr>
+                                    <td>current URL:</td>
+                                    <td class="px-3"><span class="badge text-bg-secondary">{{api-doc-url}}</span></td>
+                                </tr>
+                                <tr>
+                                    <td>status:</td>
+                                    <td class="px-3">{% if api-doc-status = :found %}
+                                        <span class="badge text-bg-success">File found</span>
+                                        {% elif api-doc-status = :not-found %}
+                                        <span class="badge text-bg-danger">File not found</span>
+                                        {% else %}
+                                        <span class="badge text-bg-danger">Error while checking for the file</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="repo" class="form-label">Repository link</label>
-                        <input type="text" class="form-control" name="repo" id="repo"
-                               aria-describedby="repoHelp" value="{{data.repo}}">
-                        <div id="repoHelp" class="form-text">
-                            Link to repository of {{service.name}} service.
-                        </div>
+                    {% else %}
+                    <div class="py-3 border-top">
+                        <h5 class="text-secondary">AsyncAPI config</h5>
+                        <div class="form-text">To enable it mark service with "{{asyncapi-label}}" label.</div>
                     </div>
-                    <div class="mb-3">
-                        <label for="repo" class="form-label">Short description</label>
-                        <textarea class="form-control" name="description" id="description"
-                                  aria-describedby="descriptionHelp"
-                                  style="height:150px">{{data.description}}</textarea>
-                        <div id="descriptionHelp" class="form-text">
-                            Couple of worlds about {{service.name}} service
+                    {% endif %}
+                    <div class="py-3 border-top">
+                        <h5>Meta data</h5>
+                        <div class="mb-3">
+                            <label for="team" class="form-label">Team ownership</label>
+                            <input type="text" class="form-control" name="team" id="team"
+                                   aria-describedby="teamHelp" value="{{data.team}}">
+                            <div id="teamHelp" class="form-text">
+                                Name of the team owning {{service.name}} service.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="repo" class="form-label">Repository link</label>
+                            <input type="text" class="form-control" name="repo" id="repo"
+                                   aria-describedby="repoHelp" value="{{data.repo}}">
+                            <div id="repoHelp" class="form-text">
+                                Link to repository of {{service.name}} service.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="repo" class="form-label">Short description</label>
+                            <textarea class="form-control" name="description" id="description"
+                                      aria-describedby="descriptionHelp"
+                                      style="height:150px">{{data.description}}</textarea>
+                            <div id="descriptionHelp" class="form-text">
+                                Couple of worlds about {{service.name}} service
+                            </div>
                         </div>
                     </div>
 
