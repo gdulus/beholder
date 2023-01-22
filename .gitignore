@@ -13,3 +13,5 @@ pom.xml.asc
 .hgignore
 .hg/
 /log
+/utils/mock-docu-service/target
+/utils/mock-docu-service/.lein-*
