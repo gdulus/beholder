@@ -3,22 +3,58 @@
 <div class="container-fluid mt-3">
     <div class="row">
         {% for service in services %}
-        <div class="col-3">
-            <div class="card shadow-sm position-relative" style="height:220px">
+        <div class="col-2">
+            <div class="card shadow-sm position-relative">
                 <h5 class="card-header clearfix">
                     <span class="title">{{service.name}}</span>
-                    <a href="/service/{{service.id}}/config" class="float-end" title="edit"><i class="bi bi-tools"></i></a>
+                    <a href="/service/{{service.id}}/config"
+                       class="float-end ms-2"
+                       title="edit">
+                        <i class="bi bi-tools text-secondary"></i>
+                    </a>
+
+                    {% if service.config.description %}
+                    <div class="float-end border-end border-start">&nbsp;</div>
+
+                    <a data-bs-toggle="collapse" href="#info_{{service.id}}"
+                       role="button" aria-expanded="false"
+                       aria-controls="info_{{service.id}}"
+                       class="float-end me-2"
+                       title="info">
+                        <i class="bi bi-info-circle text-secondary"></i>
+                    </a>
+                    {% endif %}
                 </h5>
                 <div class="card-body">
-                    <p class="card-text">{{service.config.description}}</p>
-                    {% if service.config.team %}owner: <span>{{service.config.team}}</span>{% endif %}
-                </div>
-                <div class="card-body position-absolute bottom-0 start-0">
-                    <a href="/service/{{service.id}}/doc/openapi" class="btn btn-primary">REST doc</a>
-                    {% if service.config.repo %}
-                    <a href="{{service.config.repo}}" target="_blank" class="btn btn-primary">Repo</a>
+                    {% if service.openApiEnabled? %}
+                    <a href="/service/{{service.id}}/doc/openapi" class="btn btn-success">REST doc</a>
                     {% endif %}
+
+                    {% if service.asyncApiEnabled? %}
+                    <a href="/service/{{service.id}}/doc/asyncapi" class="btn btn-success">ASYNC doc</a>
+                    {% endif %}
+
+                    <div class="mb-3 float-end" style="height:20px">
+                        {% if service.config.team %}
+                        <span class="badge bg-secondary">{{service.config.team}}</span>
+                        {% endif %}
+                        {% if service.config.repo %}
+                        <a href="{{service.config.repo}}" target="_blank" class="badge bg-secondary">repo</a>
+                        {% endif %}
+
+
+                    </div>
+
+                    {% if service.config.description %}
+                    <div class="collapse mt-3" id="info_{{service.id}}">
+                        <div class="card card-body text-dark bg-light">
+                            {{service.config.description}}
+                        </div>
+                    </div>
+                    {% endif %}
+
                 </div>
+
             </div>
 
         </div>

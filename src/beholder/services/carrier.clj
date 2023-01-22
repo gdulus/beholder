@@ -1,4 +1,4 @@
-(ns beholder.services.dashboard
+(ns beholder.services.carrier
   (:require [beholder.model :as m]
             [beholder.repositories.config :as conf]
             [beholder.repositories.k8s :as k8s]))
@@ -15,13 +15,16 @@
 
 ; ---------------------------------------------------------------------
 
-(defn list-services! []
+(defn list-carriers! []
   (let [service-configs-map (get-service-configs-map)
-        beholder-config (conf/get-beholder-config!)]
+        beholder-config (conf/get-beholder-config!)
+        openapi-label (m/get-openapi-label beholder-config)
+        asyncapi-label (m/get-asyncapi-label beholder-config)]
     (->>
       (k8s/list-services!)
-      (map #(m/->Service (:id %)
+      (map #(m/->Carrier (:id %)
                          (:name %)
-                         (some? (get-in % [:labels (m/get-openapi-label beholder-config)]))
+                         (contains? (:labels %) openapi-label)
+                         (contains? (:labels %) asyncapi-label)
                          (get service-configs-map (:id %)))))))
 

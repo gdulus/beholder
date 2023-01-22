@@ -9,6 +9,11 @@
 (def ^:private ^:const default-asyncpi-label :asyncapi)
 (def ^:private ^:const default-asyncapi-path "api/asyncapi.yml")
 
+(defn- sanitize-path [path]
+  (-> (str "/" path)
+      (str/replace #"/+" "/")
+      (subs 1)))
+
 ; --------------------------------------------------------------
 
 (s/defrecord KubernetesService [id :- s/Str
@@ -60,18 +65,13 @@
 
 ; --------------------------------------------------------------
 
-(s/defrecord Service [id :- s/Str
+(s/defrecord Carrier [id :- s/Str
                       name :- s/Str
                       openApiEnabled? :- s/Bool
+                      asyncApiEnabled? :- s/Bool
                       config :- (s/maybe ServiceConfig)])
 
-
 ; --------------------------------------------------------------
-
-(defn- sanitize-path [path]
-  (-> (str "/" path)
-      (str/replace #"/+" "/")
-      (subs 1)))
 
 (defn get-openapi-url [beholder-config k8s-service-conf service-conf]
   (str (:url k8s-service-conf) "/" (if (not (str/blank? (:openApiPath service-conf)))

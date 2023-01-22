@@ -3,7 +3,7 @@
             [beholder.model :as m]
             [beholder.repositories.config :as conf]
             [beholder.repositories.k8s :as k8s]
-            [beholder.services.dashboard :as dashboard]
+            [beholder.services.carrier :as carrier]
             [beholder.template :as tmpl]
             [clojure.string :refer [split]]
             [compojure.core :refer :all]
@@ -21,7 +21,7 @@
 
            (GET "/" []
              (ok (tmpl/html "dashboard.html"
-                            {:services (dashboard/list-services!)})))
+                            {:services (carrier/list-carriers!)})))
 
            ;; ------------------------------------------------------------
            ;; GLOBAL CONFIG
