@@ -28,12 +28,19 @@
        (first)
        (:port)))
 
+(defn- build-url [list-resource]
+  (let [app-name (get-in list-resource [:spec :selector :app])
+        override (env (keyword app-name))
+        domain (or override app-name)
+        port (when-not override (str ":" (get-port list-resource)))]
+    (str "http://" domain port)))
+
 (defn- response->KubernetesService [list-resource]
   (m/->KubernetesService
     (get-in list-resource [:metadata :uid])
     (get-in list-resource [:metadata :name])
     (get-in list-resource [:metadata :namespace])
-    (str "http://" (get-in list-resource [:spec :selector :app]) ":" (get-port list-resource))
+    (build-url list-resource)
     (get-in list-resource [:metadata :labels])
     ))
 
