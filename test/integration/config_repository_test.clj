@@ -4,7 +4,7 @@
             [clj-test-containers.core :as tc]
             [clojure.test :refer :all]))
 
-(defn start-container []
+(defn- start-container []
   (->
     (tc/create {:image-name    "docker.elastic.co/elasticsearch/elasticsearch:7.17.6"
                 :exposed-ports [9200]
@@ -16,10 +16,12 @@
                 })
     (tc/start!)))
 
-(defn build-mocked-es-config [container]
+(defn- build-mocked-es-config [container]
   {:hosts [(str "http://" (:host container) ":" (get (:mapped-ports container) 9200))]})
 
-(deftest ^:integration update-config-test
+; -------------------------------------------------------------
+
+(deftest test-BeholderConfig-crud
   (let [container (start-container)]
     (with-redefs [beholder.repositories.config/config (fn [] (build-mocked-es-config container))]
 

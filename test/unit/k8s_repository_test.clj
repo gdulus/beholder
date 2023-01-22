@@ -59,7 +59,7 @@
 
 ; -------------------------------------------------------------
 
-(deftest ^:unit list-services-test
+(deftest test-list-services!
   (testing "Test list-services with empty response"
     (with-redefs [beholder.repositories.k8s/load-k8s-services (fn [namespace] {})
                   beholder.repositories.config/get-beholder-config! (fn [] (m/->BeholderConfig "" "" "" "" ""))]
@@ -78,8 +78,7 @@
         (is (= (m/map->KubernetesService {:id "id4" :name "openapi-app", :namespace "default", :url "http://openapi-app:3000", :labels {:app "openapi-app" :openapi "true"}})
                (find-K8SService-by-name response "openapi-app"))))))
 
-
-  (testing "Test list-services different namespaces"
+  (testing "Test list-services with different namespaces"
     (with-redefs [beholder.repositories.k8s/load-k8s-services (fn [namespace] (get multiple-namespaces namespace))
                   beholder.repositories.config/get-beholder-config! (fn [] (m/->BeholderConfig ["n1", "n2"] "" "" "" ""))]
       (let [response (list-services!)]
@@ -89,7 +88,7 @@
         (is (= (m/map->KubernetesService {:id "id2" :name "app2", :namespace "n2", :url "http://beholder:3000", :labels {:app "app2" :openapi "true"}})
                (find-K8SService-by-name response "app2"))))))
 
-  (testing "Test filtering with default openapi label"
+  (testing "Test list-services filtering with default openapi label"
     (with-redefs [beholder.repositories.k8s/load-k8s-services (fn [namespace] test-filter-responses)
                   beholder.repositories.config/get-beholder-config! (fn [] (m/->BeholderConfig ["n1"] "" "" "" ""))]
       (let [response (list-services!)]
@@ -97,7 +96,7 @@
         (is (= (m/map->KubernetesService {:id "id2" :name "default-openapi-label", :namespace "default", :url "http://default-openapi-label:8080", :labels {:app "default-openapi-label" :openapi "true"}})
                (find-K8SService-by-name response "default-openapi-label"))))))
 
-  (testing "Test filtering with custom openapi label"
+  (testing "Test list-services filtering with custom openapi label"
     (with-redefs [beholder.repositories.k8s/load-k8s-services (fn [namespace] test-filter-responses)
                   beholder.repositories.config/get-beholder-config! (fn [] (m/->BeholderConfig ["n1"] "custom-openapi" "" "" ""))]
       (let [response (list-services!)]

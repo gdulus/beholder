@@ -2,7 +2,7 @@
   (:require [beholder.model :as m]
             [clojure.test :refer :all]))
 
-(deftest ^:unit test-BeholderConfig-model
+(deftest test-BeholderConfig-model
   (testing "Test get-namespaces"
     (is (= (m/get-namespaces (m/->BeholderConfig nil "" "" "" "")) ["default"]))
     (is (= (m/get-namespaces (m/->BeholderConfig [] "" "" "" "")) ["default"]))
@@ -11,7 +11,7 @@
     (is (= (m/get-namespaces (m/->BeholderConfig ["n1" "n2"] "" "" "" "")) ["n1" "n2"]))))
 
 
-(deftest ^:unit test-common-functions
+(deftest test-common-functions
   (testing "Test get-openapi-url"
     (is (= "/api/openapi.yml"
            (m/get-openapi-url (m/map->BeholderConfig {})
