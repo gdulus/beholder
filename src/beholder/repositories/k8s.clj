@@ -17,11 +17,12 @@
                     :action  :list
                     :request {:namespace n}}))
 
-(defn- valid-service? [openapi-label asyncapi-label list-resource]
-  (let [labels (get-in list-resource [:metadata :labels])]
-    (and (some? (get-in list-resource [:spec :selector :app]))
-         (or (contains? labels openapi-label)
-             (contains? labels asyncapi-label)))))
+(defn- valid-service? [list-resource]
+  (some? (get-in list-resource [:spec :selector :app])))
+
+(defn- doc-enabled? [k8s-service]
+  (or (:openApiEnabled? k8s-service)
+      (:asyncApiEnabled? k8s-service)))
 
 (defn- get-port [list-resource]
   (->> (get-in list-resource [:spec :ports])
@@ -59,9 +60,10 @@
     (->>
       (map load-k8s-services namespaces)
       (mapcat :items)
-      (filter #(valid-service? openapi-label asyncapi-label %))
+      (filter valid-service?)
       (map #(response->KubernetesService % openapi-label asyncapi-label))
-      (map validate-KubernetesService))))
+      (map validate-KubernetesService)
+      (filter doc-enabled?))))
 
 (defn get-service! [id]
   (->>

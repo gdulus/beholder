@@ -1,17 +1,7 @@
 (ns beholder.services.indexer
   (:require [chime.core :refer [chime-at periodic-seq]]
-            [taoensso.timbre :as log]
-            [beholder.repositories.k8s :as k8s]
-            [beholder.repositories.es :as es])
+            [taoensso.timbre :as log])
   (:import (java.time Duration Instant)))
-
-
-
-(defn get-asyncapi-services []
-  (let [beholder-config (es/get-beholder-config!)])
-  (->> (k8s/list-services!)
-      (filter )))
-
 
 
 
