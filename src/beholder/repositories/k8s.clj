@@ -35,14 +35,16 @@
         port (when-not override (str ":" (get-port list-resource)))]
     (str "http://" domain port)))
 
-(defn- response->KubernetesService [list-resource]
-  (m/->KubernetesService
-    (get-in list-resource [:metadata :uid])
-    (get-in list-resource [:metadata :name])
-    (get-in list-resource [:metadata :namespace])
-    (build-url list-resource)
-    (get-in list-resource [:metadata :labels])
-    ))
+(defn- response->KubernetesService [list-resource openapi-label asyncapi-label]
+  (let [labels (get-in list-resource [:metadata :labels])]
+    (m/->KubernetesService
+      (get-in list-resource [:metadata :uid])
+      (get-in list-resource [:metadata :name])
+      (get-in list-resource [:metadata :namespace])
+      (build-url list-resource)
+      labels
+      (contains? labels openapi-label)
+      (contains? labels asyncapi-label))))
 
 (defn- validate-KubernetesService [service]
   (s/validate KubernetesService service))
@@ -51,14 +53,14 @@
 
 (defn list-services! []
   (let [config (es/get-beholder-config!)
-        openapi-label (log/spy :info "OpenAPI K8S label" (m/get-openapi-label config))
-        asyncapi-label (log/spy :info "AsyncAPI K8S label" (m/get-asyncapi-label config))
-        namespaces (log/spy :info "Namespaces to scan" (m/get-namespaces config))]
+        openapi-label (m/get-openapi-label config)
+        asyncapi-label (m/get-asyncapi-label config)
+        namespaces (m/get-namespaces config)]
     (->>
       (map load-k8s-services namespaces)
       (mapcat :items)
       (filter #(valid-service? openapi-label asyncapi-label %))
-      (map response->KubernetesService)
+      (map #(response->KubernetesService % openapi-label asyncapi-label))
       (map validate-KubernetesService))))
 
 (defn get-service! [id]

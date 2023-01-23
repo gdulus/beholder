@@ -16,15 +16,12 @@
 ; ---------------------------------------------------------------------
 
 (defn list-carriers! []
-  (let [service-configs-map (get-service-configs-map)
-        beholder-config (es/get-beholder-config!)
-        openapi-label (m/get-openapi-label beholder-config)
-        asyncapi-label (m/get-asyncapi-label beholder-config)]
+  (let [service-configs-map (get-service-configs-map)]
     (->>
       (k8s/list-services!)
       (map #(m/->Carrier (:id %)
                          (:name %)
-                         (contains? (:labels %) openapi-label)
-                         (contains? (:labels %) asyncapi-label)
+                         (:openApiEnabled? %)
+                         (:asyncApiEnabled? %)
                          (get service-configs-map (:id %)))))))
 

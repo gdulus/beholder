@@ -4,6 +4,7 @@
             [beholder.repositories.es :as es]
             [beholder.repositories.k8s :as k8s]
             [beholder.services.carrier :as carrier]
+            [beholder.services.indexer :as indexer]
             [beholder.template :as tmpl]
             [clojure.string :refer [split]]
             [compojure.core :refer :all]
@@ -11,6 +12,12 @@
             [ring.middleware.defaults :refer [wrap-defaults]]
             [ring.util.http-response :refer :all]
             [taoensso.timbre :as log]))
+
+;; ------------------------------------------------------------
+
+(indexer/start)
+
+;; ------------------------------------------------------------
 
 (defroutes app-routes
            (route/resources "/static")
@@ -60,11 +67,11 @@
                      ; ----------
                      openapi-url (m/get-openapi-url beholder-conf k8s-service service-conf)
                      openapi-label (m/get-openapi-label beholder-conf)
-                     openapi-supported? (contains? (:labels k8s-service) openapi-label)
+                     openapi-supported? (:openApiEnabled? k8s-service)
                      ; ----------
                      asyncapi-url (m/get-asyncapi-url beholder-conf k8s-service service-conf)
                      asyncapi-label (m/get-asyncapi-label beholder-conf)
-                     asyncapi-supported? (contains? (:labels k8s-service) asyncapi-label)]
+                     asyncapi-supported? (:asyncApiEnabled? k8s-service)]
                  (ok (tmpl/html "service-config.html"
                                 {:status   status
                                  :service  k8s-service

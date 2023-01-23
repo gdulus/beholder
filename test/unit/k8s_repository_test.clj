@@ -77,23 +77,29 @@
                   beholder.repositories.es/get-beholder-config! (fn [] (m/->BeholderConfig ["n1"] "" "" "" ""))]
       (let [response (list-services!)]
         (is (= 3 (count response)))
-        (is (= (m/map->KubernetesService {:id        "id1"
-                                          :name      "beholder",
-                                          :namespace "default",
-                                          :url       "http://beholder:3000",
-                                          :labels    {:app "beholder" :openapi "true"}})
+        (is (= (m/map->KubernetesService {:id               "id1"
+                                          :name             "beholder",
+                                          :namespace        "default",
+                                          :url              "http://beholder:3000",
+                                          :labels           {:app "beholder" :openapi "true"}
+                                          :openApiEnabled?  true
+                                          :asyncApiEnabled? false})
                (find-K8SService-by-name response "beholder")))
         (is (= (m/map->KubernetesService {:id        "id2"
                                           :name      "hello-minikube",
                                           :namespace "default",
                                           :url       "http://hello-minikube:8080",
-                                          :labels    {:app "hello-minikube" :openapi "true"}})
+                                          :labels    {:app "hello-minikube" :openapi "true"}
+                                          :openApiEnabled?  true
+                                          :asyncApiEnabled? false})
                (find-K8SService-by-name response "hello-minikube")))
         (is (= (m/map->KubernetesService {:id        "id4"
                                           :name      "openapi-app",
                                           :namespace "default", :url
                                           "http://openapi-app:3000", :labels
-                                          {:app "openapi-app" :openapi "true"}})
+                                          {:app "openapi-app" :openapi "true"}
+                                          :openApiEnabled?  true
+                                          :asyncApiEnabled? false})
                (find-K8SService-by-name response "openapi-app"))))))
 
   (testing "Test list-services with different namespaces"
@@ -105,13 +111,17 @@
                                           :name      "app1",
                                           :namespace "n1",
                                           :url       "http://beholder:3000",
-                                          :labels    {:app "app1" :openapi "true"}})
+                                          :labels    {:app "app1" :openapi "true"}
+                                          :openApiEnabled?  true
+                                          :asyncApiEnabled? false})
                (find-K8SService-by-name response "app1")))
         (is (= (m/map->KubernetesService {:id        "id2"
                                           :name      "app2",
                                           :namespace "n2",
                                           :url       "http://beholder:3000",
-                                          :labels    {:app "app2" :openapi "true"}})
+                                          :labels    {:app "app2" :openapi "true"}
+                                          :openApiEnabled?  true
+                                          :asyncApiEnabled? false})
                (find-K8SService-by-name response "app2"))))))
 
   (testing "Test list-services filtering with default openapi label"
@@ -122,7 +132,9 @@
         (is (= (m/map->KubernetesService {:id        "id2" :name "default-openapi-label",
                                           :namespace "default",
                                           :url       "http://default-openapi-label:8080",
-                                          :labels    {:app "default-openapi-label" :openapi "true"}})
+                                          :labels    {:app "default-openapi-label" :openapi "true"}
+                                          :openApiEnabled?  true
+                                          :asyncApiEnabled? false})
                (find-K8SService-by-name response "default-openapi-label"))))))
 
   (testing "Test list-services filtering with custom openapi label"
@@ -133,7 +145,9 @@
         (is (= (m/map->KubernetesService {:id        "id4" :name "custom-openapi-label",
                                           :namespace "default",
                                           :url       "http://custom-openapi-label:3000",
-                                          :labels    {:app "custom-openapi-label" :custom-openapi "true"}})
+                                          :labels    {:app "custom-openapi-label" :custom-openapi "true"}
+                                          :openApiEnabled?  true
+                                          :asyncApiEnabled? false})
                (find-K8SService-by-name response "custom-openapi-label"))))))
 
   (testing "Test list-services filtering with default asyncapi label"
@@ -144,7 +158,9 @@
         (is (= (m/map->KubernetesService {:id        "id5" :name "default-asyncapi-label",
                                           :namespace "default",
                                           :url       "http://default-asyncapi-label:3000",
-                                          :labels    {:app "default-asyncapi-label" :asyncapi "true"}})
+                                          :labels    {:app "default-asyncapi-label" :asyncapi "true"}
+                                          :openApiEnabled?  false
+                                          :asyncApiEnabled? true})
                (find-K8SService-by-name response "default-asyncapi-label"))))))
 
   (testing "Test list-services filtering with custom asyncapi label"
@@ -155,7 +171,9 @@
         (is (= (m/map->KubernetesService {:id        "id6" :name "custom-asyncapi-label",
                                           :namespace "default",
                                           :url       "http://custom-asyncapi-label:3000",
-                                          :labels    {:app "custom-asyncapi-label" :custom-asyncapi "true"}})
+                                          :labels    {:app "custom-asyncapi-label" :custom-asyncapi "true"}
+                                          :openApiEnabled?  false
+                                          :asyncApiEnabled? true})
                (find-K8SService-by-name response "custom-asyncapi-label")))))))
 
 

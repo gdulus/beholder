@@ -20,7 +20,9 @@
                                 name :- s/Str
                                 namespace :- s/Str
                                 url :- url
-                                labels :- (s/maybe {s/Keyword s/Str})])
+                                labels :- (s/maybe {s/Keyword s/Str})
+                                openApiEnabled? :- s/Bool
+                                asyncApiEnabled? :- s/Bool])
 
 ; --------------------------------------------------------------
 
