@@ -27,12 +27,26 @@
                 </h5>
                 <div class="card-body">
                     {% if service.openApiEnabled? %}
-                    <a href="/service/{{service.serviceId}}/doc/openapi" class="btn btn-success">REST doc</a>
+                    <a href="/service/{{service.serviceId}}/doc/openapi" class="btn btn-success">REST</a>
                     {% endif %}
 
+
                     {% if service.asyncApiEnabled? %}
+                    {% if service.openApiCached? %}
                     <a href="/service/{{service.serviceId}}/doc/asyncapi" class="btn btn-success">ASYNC doc</a>
+                    {% else %}
+                    <button class="btn btn-outline-secondary"
+                            style="cursor: wait"
+                            type="button"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="bottom"
+                            title="AsyncAPI doc indexing in progress. Please refresh the page in couple of minutes.">
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span class="sr-only">ASYNC</span>
+                    </button>
                     {% endif %}
+                    {% endif %}
+
 
                     <div class="mb-3 float-end" style="height:20px">
                         {% if service.config.team %}
@@ -61,4 +75,5 @@
         {% endfor %}
     </div>
 </div>
+
 {% endblock %}
