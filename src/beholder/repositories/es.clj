@@ -6,8 +6,7 @@
             [schema.core :as s]
             [taoensso.timbre :refer [spy]]
             [taoensso.timbre])
-  (:import (beholder.model BeholderConfig)
-           (beholder.model ServiceConfig)))
+  (:import (beholder.model BeholderConfig ServiceConfig ServiceDocumentation)))
 
 (defn config []
   (spy :info
@@ -22,12 +21,13 @@
 
 (defn delete-indexes! []
   (e/request @c {:method :delete :url [:beholder-config]})
-  (e/request @c {:method :delete :url [:services-config]}))
-
+  (e/request @c {:method :delete :url [:services-config]})
+  (e/request @c {:method :delete :url [:services-documentation]}))
 
 (defn create-indexes! []
   (e/request @c {:method :put :url [:beholder-config]})
-  (e/request @c {:method :put :url [:services-config]}))
+  (e/request @c {:method :put :url [:services-config]})
+  (e/request @c {:method :put :url [:services-documentation]}))
 
 ; ----------------------------------------------------------------
 ; Basic operations
@@ -93,3 +93,17 @@
   (validate-and-save [:services-config :_doc (:serviceId config)]
                      ServiceConfig
                      config))
+
+; ----------------------------------------------------------------
+; ServiceDocumentation
+; ----------------------------------------------------------------
+
+(defn get-service-documentation! [id]
+  (get-by-id-and-validate [:services-documentation :_doc id]
+                          ServiceDocumentation
+                          m/map->ServiceDocumentation))
+
+(defn save-service-documentation! [^ServiceDocumentation doc]
+  (validate-and-save [:services-documentation :_doc (:serviceId doc)]
+                     ServiceDocumentation
+                     doc))

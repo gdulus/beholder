@@ -65,17 +65,18 @@
 
 ; --------------------------------------------------------------
 
-(s/defrecord Carrier [id :- s/Str
+(s/defrecord ServiceDocumentation [serviceId :- s/Str
+                                   openApiDoc :- (s/maybe s/Str)
+                                   asyncApiDoc :- (s/maybe s/Str)])
+
+; --------------------------------------------------------------
+
+
+(s/defrecord Carrier [serviceId :- s/Str
                       name :- s/Str
                       openApiEnabled? :- s/Bool
                       asyncApiEnabled? :- s/Bool
                       config :- (s/maybe ServiceConfig)])
-
-; --------------------------------------------------------------
-
-(s/defrecord ServiceDocumentation [serviceId :- s/Str
-                                   openApiDoc :- (s/maybe s/Str)
-                                   asyncApiDoc :- (s/maybe s/Str)])
 
 ; --------------------------------------------------------------
 

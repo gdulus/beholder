@@ -7,7 +7,7 @@
             <div class="card shadow-sm position-relative">
                 <h5 class="card-header clearfix">
                     <span class="title">{{service.name}}</span>
-                    <a href="/service/{{service.id}}/config"
+                    <a href="/service/{{service.serviceId}}/config"
                        class="float-end ms-2"
                        title="edit">
                         <i class="bi bi-tools text-secondary"></i>
@@ -16,9 +16,9 @@
                     {% if service.config.description %}
                     <div class="float-end border-end border-start">&nbsp;</div>
 
-                    <a data-bs-toggle="collapse" href="#info_{{service.id}}"
+                    <a data-bs-toggle="collapse" href="#info_{{service.serviceId}}"
                        role="button" aria-expanded="false"
-                       aria-controls="info_{{service.id}}"
+                       aria-controls="info_{{service.serviceId}}"
                        class="float-end me-2"
                        title="info">
                         <i class="bi bi-info-circle text-secondary"></i>
@@ -27,11 +27,11 @@
                 </h5>
                 <div class="card-body">
                     {% if service.openApiEnabled? %}
-                    <a href="/service/{{service.id}}/doc/openapi" class="btn btn-success">REST doc</a>
+                    <a href="/service/{{service.serviceId}}/doc/openapi" class="btn btn-success">REST doc</a>
                     {% endif %}
 
                     {% if service.asyncApiEnabled? %}
-                    <a href="/service/{{service.id}}/doc/asyncapi" class="btn btn-success">ASYNC doc</a>
+                    <a href="/service/{{service.serviceId}}/doc/asyncapi" class="btn btn-success">ASYNC doc</a>
                     {% endif %}
 
                     <div class="mb-3 float-end" style="height:20px">
@@ -46,7 +46,7 @@
                     </div>
 
                     {% if service.config.description %}
-                    <div class="collapse mt-3" id="info_{{service.id}}">
+                    <div class="collapse mt-3" id="info_{{service.serviceId}}">
                         <div class="card card-body text-dark bg-light">
                             {{service.config.description}}
                         </div>

@@ -29,6 +29,21 @@
   (let [container (start-container)]
     (with-redefs [beholder.repositories.es/config (fn [] (build-mocked-es-config container))]
 
+      (testing "When no ServiceDocumentation entries get-service-documentation! should return nil"
+        (is (some? (r/create-indexes!)))
+        (is (nil? (r/get-service-documentation! 123)))
+        (is (some? (r/delete-indexes!))))
+
+      (testing "When saved ServiceDocumentation get-service-documentation! should return it"
+        (let [service-docs (m/->ServiceDocumentation "123" "openapi doc" "asyncapi doc")]
+          (is (some? (r/create-indexes!)))
+          (is (= service-docs (r/save-service-documentation! service-docs)))
+          (wait)
+          (is (= service-docs (r/get-service-documentation! "123")))
+          (is (some? (r/delete-indexes!)))))
+
+      ; -----------
+
       (testing "When no ServiceConfig entries get-service-config should return nil"
         (is (some? (r/create-indexes!)))
         (is (nil? (r/get-service-config 123)))
