@@ -50,7 +50,7 @@
         (is (some? (r/delete-indexes!))))
 
       (testing "When saved ServiceConfig get-service-config should return it"
-        (let [service-config (m/->ServiceConfig "123" "path/openapi" "path/asyncapi" "my team" "path/repo" "my description")]
+        (let [service-config (m/->ServiceConfig "123" "path/openapi" "path/asyncapi" "my team" "path/repo" "my description" false false)]
           (is (some? (r/create-indexes!)))
           (is (= service-config (r/save-service-config! service-config)))
           (wait)
@@ -58,9 +58,9 @@
           (is (some? (r/delete-indexes!)))))
 
       (testing "When saved ServiceConfig list-service-configs should return without duplicates"
-        (let [sc1v1 (m/->ServiceConfig "1" "path/openapi1" "path/asyncapi1" "my team1" "path/repo1" "my description1")
-              sc1v2 (m/->ServiceConfig "1" "path/openapi1v2" "path/asyncapi1v2" "my team1v2" "path/repo1v2" "my description1v2")
-              sc2v1 (m/->ServiceConfig "2" "path/openapi2" "path/asyncapi2" "my team2" "path/repo2" "my description2")]
+        (let [sc1v1 (m/->ServiceConfig "1" "path/openapi1" "path/asyncapi1" "my team1" "path/repo1" "my description1" false false)
+              sc1v2 (m/->ServiceConfig "1" "path/openapi1v2" "path/asyncapi1v2" "my team1v2" "path/repo1v2" "my description1v2" false false)
+              sc2v1 (m/->ServiceConfig "2" "path/openapi2" "path/asyncapi2" "my team2" "path/repo2" "my description2" false false)]
           (is (some? (r/create-indexes!)))
 
           (is (= sc1v1 (r/save-service-config! sc1v1)))

@@ -61,7 +61,9 @@
                             asyncApiPath :- (s/maybe s/Str)
                             team :- (s/maybe s/Str)
                             repo :- (s/maybe s/Str)
-                            description :- (s/maybe s/Str)])
+                            description :- (s/maybe s/Str)
+                            openApiCached :- (s/maybe s/Bool)
+                            asyncApiCached :- (s/maybe s/Bool)])
 
 ; --------------------------------------------------------------
 

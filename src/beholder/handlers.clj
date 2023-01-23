@@ -80,7 +80,12 @@
 
              (POST "/config" [openApiPath asyncApiPath team repo description]
                (as->
-                 (m/->ServiceConfig id openApiPath asyncApiPath team repo description) v
+                 (m/map->ServiceConfig {:serviceId    id
+                                        :openApiPath  openApiPath
+                                        :asyncApiPath asyncApiPath
+                                        :team         team
+                                        :repo         repo
+                                        :description  description}) v
                  (es/save-service-config! v)
                  (str "/service/" id "/config?status=success")
                  (moved-permanently v))))
