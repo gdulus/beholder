@@ -1,6 +1,6 @@
 (ns beholder.repositories.k8s
   (:require [beholder.model :as m]
-            [beholder.repositories.config :as c]
+            [beholder.repositories.es :as es]
             [environ.core :refer [env]]
             [kubernetes-api.core :as k8s]
             [schema.core :as s]
@@ -50,7 +50,7 @@
 ; ----------------------------------------------------------------
 
 (defn list-services! []
-  (let [config (c/get-beholder-config!)
+  (let [config (es/get-beholder-config!)
         openapi-label (log/spy :info "OpenAPI K8S label" (m/get-openapi-label config))
         asyncapi-label (log/spy :info "AsyncAPI K8S label" (m/get-asyncapi-label config))
         namespaces (log/spy :info "Namespaces to scan" (m/get-namespaces config))]

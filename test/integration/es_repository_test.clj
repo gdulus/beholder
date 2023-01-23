@@ -1,6 +1,6 @@
-(ns integration.config-repository-test
+(ns integration.es-repository-test
   (:require [beholder.model :as m]
-            [beholder.repositories.config :as r]
+            [beholder.repositories.es :as r]
             [clj-test-containers.core :as tc]
             [clojure.test :refer :all]))
 
@@ -27,7 +27,7 @@
 (deftest test-crud-operations
 
   (let [container (start-container)]
-    (with-redefs [beholder.repositories.config/config (fn [] (build-mocked-es-config container))]
+    (with-redefs [beholder.repositories.es/config (fn [] (build-mocked-es-config container))]
 
       (testing "When no ServiceConfig entries get-service-config should return nil"
         (is (some? (r/create-indexes!)))

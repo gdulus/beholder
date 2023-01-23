@@ -1,11 +1,11 @@
-(ns beholder.repositories.config
+(ns beholder.repositories.es
   (:require [beholder.model :as m]
             [clojure.string :as str]
             [environ.core :refer [env]]
             [qbits.spandex :as e]
             [schema.core :as s]
             [taoensso.timbre :refer [spy]]
-            [taoensso.timbre :as log])
+            [taoensso.timbre])
   (:import (beholder.model BeholderConfig)
            (beholder.model ServiceConfig)))
 

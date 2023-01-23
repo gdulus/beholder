@@ -3,20 +3,21 @@
 (require '[bb-dialog.core :refer :all]
          '[babashka.process :refer [shell]])
 
-(def commands {:init-dev        "Init dev env"
-               :build-beholder  "Build beholder docker image"
-               :deploy-beholder "Deploy beholder to local K8S"
-               :start-beholder  "Start beholder app"
-               :build-mock      "Build mock service docker image"
-               :deploy-mock     "Deploy mock to local K8S"})
+(def commands {:init-dev         "Init dev env"
+               :build-beholder   "Build beholder docker image"
+               :deploy-beholder  "Deploy beholder to local K8S"
+               :start-beholder   "Start beholder app"
+               :build-mock       "Build mock service docker image"
+               :deploy-mock      "Deploy mock to local K8S"
+               :deploy-generator "Deploy asyncapi generator to local K8S"})
 
 (defn safe-shell
   ([cmd] (try
            (shell cmd)
            (catch Exception _)))
   ([options cmd] (try
-           (shell options cmd)
-           (catch Exception _))))
+                   (shell options cmd)
+                   (catch Exception _))))
 
 (defn what-to-do-dialog []
   (menu "BEHOLDER DEV TOOLS" "What do you want to do?" commands))
@@ -137,6 +138,27 @@
                                       (shell "kubectl expose deployment mock-docu-both --type=LoadBalancer --port=3000")
                                       (shell "kubectl label service mock-docu-both openapi=true")
                                       (shell "kubectl label service mock-docu-both asyncapi=true")))
+
+
+(defmethod command :deploy-generator [_] (do
+                                           (shell "clear")
+
+                                           (println "-----------------------------")
+                                           (println "pulling asyncapi-generator-service image")
+                                           (println "-----------------------------")
+                                           (shell " docker pull gdulus/asyncapi-generator-service")
+
+                                           (println "-----------------------------")
+                                           (println "removing asyncapi-generator-service from k8s")
+                                           (println "-----------------------------")
+                                           (safe-shell "kubectl delete deployment asyncapi-generator-service")
+                                           (safe-shell "kubectl delete service asyncapi-generator-service")
+
+                                           (println "-----------------------------")
+                                           (println "deploying asyncapi-generator-service to k8s")
+                                           (println "-----------------------------")
+                                           (shell "kubectl create deployment asyncapi-generator-service --image=gdulus/asyncapi-generator-service:latest")
+                                           (shell "kubectl expose deployment asyncapi-generator-service --type=LoadBalancer --port=3000")))
 
 
 ; -----------------------------------------------------------------------

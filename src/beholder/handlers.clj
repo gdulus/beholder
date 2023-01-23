@@ -1,7 +1,7 @@
 (ns beholder.handlers
   (:require [beholder.helpers :refer [fetch-remote-resource remote-resource-exists?]]
             [beholder.model :as m]
-            [beholder.repositories.config :as conf]
+            [beholder.repositories.es :as es]
             [beholder.repositories.k8s :as k8s]
             [beholder.services.carrier :as carrier]
             [beholder.template :as tmpl]
@@ -30,7 +30,7 @@
            (context "/config" []
              (GET "/" []
                (as->
-                 (conf/get-beholder-config!) v
+                 (es/get-beholder-config!) v
                  (or v (m/map->BeholderConfig {:namespaces []}))
                  {:data v}
                  (tmpl/html "beholder-config.html" v)
@@ -43,7 +43,7 @@
                                      openApiPath
                                      asyncApiLabel
                                      asyncApiPath)
-                 (conf/save-beholder-config!)
+                 (es/save-beholder-config!)
                  (assoc {:status :success} :data)
                  (tmpl/html "beholder-config.html")
                  (ok))))
@@ -54,8 +54,8 @@
 
            (context "/service/:id" [id]
              (GET "/config" [status]
-               (let [beholder-conf (conf/get-beholder-config!)
-                     service-conf (conf/get-service-config id)
+               (let [beholder-conf (es/get-beholder-config!)
+                     service-conf (es/get-service-config id)
                      k8s-service (k8s/get-service! id)
                      ; ----------
                      openapi-url (m/get-openapi-url beholder-conf k8s-service service-conf)
@@ -81,7 +81,7 @@
              (POST "/config" [openApiPath asyncApiPath team repo description]
                (as->
                  (m/->ServiceConfig id openApiPath asyncApiPath team repo description) v
-                 (conf/save-service-config! v)
+                 (es/save-service-config! v)
                  (str "/service/" id "/config?status=success")
                  (moved-permanently v))))
 
@@ -94,8 +94,8 @@
                (ok (tmpl/html "openapi-ui.html" {:id id})))
 
              (GET "/proxy" []
-               (let [beholder-conf (conf/get-beholder-config!)
-                     service-conf (conf/get-service-config id)
+               (let [beholder-conf (es/get-beholder-config!)
+                     service-conf (es/get-service-config id)
                      k8s-service (k8s/get-service! id)
                      api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)]
                  (log/info "Requesting OpenAPI doc from" api-doc-url)

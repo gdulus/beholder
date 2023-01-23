@@ -73,6 +73,12 @@
 
 ; --------------------------------------------------------------
 
+(s/defrecord ServiceDocumentation [serviceId :- s/Str
+                                   openApiDoc :- (s/maybe s/Str)
+                                   asyncApiDoc :- (s/maybe s/Str)])
+
+; --------------------------------------------------------------
+
 (defn get-openapi-url [beholder-config k8s-service-conf service-conf]
   (str (:url k8s-service-conf) "/" (if (not (str/blank? (:openApiPath service-conf)))
                                      (sanitize-path (:openApiPath service-conf))
