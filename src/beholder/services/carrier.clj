@@ -15,13 +15,18 @@
 
 ; ---------------------------------------------------------------------
 
-(defn list-carriers! []
-  (let [service-configs-map (get-service-configs-map)]
-    (->>
-      (k8s/list-services!)
-      (map #(m/->Carrier (:id %)
-                         (:name %)
-                         (:openApiEnabled? %)
-                         (:asyncApiEnabled? %)
-                         (get service-configs-map (:id %)))))))
+(defn list-carriers!
+  ([]
+   (list-carriers! (constantly true)))
+  ([filter-criteria]
+   (let [service-configs-map (get-service-configs-map)]
+     (->>
+       (k8s/list-services!)
+       (filter filter-criteria)
+       (map #(m/->Carrier (:id %)
+                          (:name %)
+                          (:openApiEnabled? %)
+                          (:asyncApiEnabled? %)
+                          (get service-configs-map (:id %))
+                          %))))))
 

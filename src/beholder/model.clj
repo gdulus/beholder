@@ -69,9 +69,13 @@
 
 ; --------------------------------------------------------------
 
+
+(s/defrecord AsyncApiDocumentation [version :- s/Str
+                                    body :- s/Str])
+
 (s/defrecord ServiceDocumentation [serviceId :- s/Str
                                    openApiDoc :- (s/maybe s/Str)
-                                   asyncApiDoc :- (s/maybe s/Str)])
+                                   asyncApiDoc :- (s/maybe AsyncApiDocumentation)])
 
 ; --------------------------------------------------------------
 
@@ -80,7 +84,8 @@
                       name :- s/Str
                       openApiEnabled? :- s/Bool
                       asyncApiEnabled? :- s/Bool
-                      config :- (s/maybe ServiceConfig)])
+                      config :- (s/maybe ServiceConfig)
+                      k8sService :- (s/maybe KubernetesService)])
 
 ; --------------------------------------------------------------
 

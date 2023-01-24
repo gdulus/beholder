@@ -1,7 +1,7 @@
 #!/usr/bin/env bb
 
 (require '[bb-dialog.core :refer :all]
-         '[babashka.process :refer [shell]])
+         '[babashka.process :refer [shell process]])
 
 (def commands {:init-dev         "Init dev env"
                :build-beholder   "Build beholder docker image"
@@ -18,6 +18,11 @@
   ([options cmd] (try
                    (shell options cmd)
                    (catch Exception _))))
+
+(defn safe-process
+  [cmd] (try
+          (process cmd)
+          (catch Exception _)))
 
 (defn what-to-do-dialog []
   (menu "BEHOLDER DEV TOOLS" "What do you want to do?" commands))
@@ -72,7 +77,11 @@
                                    (println "eval $(minikube docker-env)")
                                    (println "-----------------------------")
                                    (shell "minikube start --driver=docker")
-                                   (safe-shell "kubectl proxy --port=8080 &")))
+                                   (println "-----------------------------")
+                                   (println "starting proxy")
+                                   (println "-----------------------------")
+                                   (safe-process "kubectl proxy --port=8080 &")
+                                   (println "done")))
 
 (defmethod command :build-beholder [_] (do
                                          (shell "clear")
