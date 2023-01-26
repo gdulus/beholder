@@ -4,9 +4,9 @@
             [beholder.repositories.es :as es]
             [beholder.repositories.k8s :as k8s]
             [beholder.services.carrier :as carrier]
-            [beholder.services.indexer :as indexer]
             [beholder.template :as tmpl]
             [clojure.string :refer [split]]
+            [clojure.string :as str]
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults]]
@@ -112,6 +112,22 @@
                      api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)]
                  (log/info "Requesting OpenAPI doc from" api-doc-url)
                  (fetch-remote-resource api-doc-url))))
+
+           ;; ------------------------------------------------------------
+           ;; DOCUMENTATION RENDERING - OPENAPI
+           ;; ------------------------------------------------------------
+
+           (context "/service/:id/doc/asyncapi" [id]
+             (GET "/" []
+               (ok (tmpl/html "asyncapi-ui.html" {:id id})))
+
+             (GET "/proxy" []
+               (if-let [service-doc (es/get-service-documentation! id)]
+                 (->
+                   (get-in service-doc [:asyncApiDoc :body])
+                   (str/replace #"css/global.min.css" "/static/asyncapi/global.min.css")
+                   (str/replace #"css/asyncapi.min.css" "/static/asyncapi/asyncapi.min.css")
+                   (str/replace #"js/asyncapi-ui.min.js" "/static/asyncapi/asyncapi-ui.min.js")))))
 
            ;; ------------------------------------------------------------
            ;; OTHER

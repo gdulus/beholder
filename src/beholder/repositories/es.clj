@@ -99,11 +99,12 @@
 ; ----------------------------------------------------------------
 
 (defn get-service-documentation! [id]
-  (get-by-id-and-validate [:services-documentation :_doc id]
-                          ServiceDocumentation
-                          m/map->ServiceDocumentation))
+  (when-let [raw (not-empty (get-by-id [:services-documentation :_doc id]))]
+    (let [async-doc (m/map->AsyncApiDocumentation (:asyncApiDoc raw))]
+      (m/map->ServiceDocumentation (assoc raw :asyncApiDoc async-doc)))))
 
 (defn save-service-documentation! [^ServiceDocumentation doc]
   (validate-and-save [:services-documentation :_doc (:serviceId doc)]
                      ServiceDocumentation
                      doc))
+

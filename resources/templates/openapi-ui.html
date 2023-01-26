@@ -1,11 +1,12 @@
 {% extends "templates/base.html" %}
+
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/static/swagger/swagger-ui.css">
+{% endblock %}
+
 {% block body %}
 <div id="swagger-ui"></div>
-
-<script src="/static/swagger/swagger-ui-bundle.js"></script>
-<script src="/static/swagger/swagger-ui-standalone-preset.js"></script>
-
-{{service}}
 
 <script>
 window.onload = function() {
@@ -21,4 +22,9 @@ window.onload = function() {
   window.ui = ui
 }
 </script>
+{% endblock %}
+
+{% block js %}
+<script src="/static/swagger/swagger-ui-bundle.js"></script>
+<script src="/static/swagger/swagger-ui-standalone-preset.js"></script>
 {% endblock %}

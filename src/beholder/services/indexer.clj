@@ -36,6 +36,7 @@
            v)
       )))
 
+
 (defn start []
   (let [now (Instant/now)
         period (Duration/ofSeconds 10)]

@@ -1,0 +1,17 @@
+html, body {
+    height: 100%;
+}
+
+.fill {
+    min-height: 100%;
+    height: 100%;
+}
+
+.embed-adjust {
+     position:relative;
+     top: -40px;
+}
+
+.navbar {
+     z-index:1000;
+}
