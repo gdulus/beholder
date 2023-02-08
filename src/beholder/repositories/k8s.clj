@@ -70,6 +70,3 @@
     (list-services!)
     (filter #(= id (:id %)))
     (first)))
-
-
-

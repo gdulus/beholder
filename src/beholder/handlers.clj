@@ -1,26 +1,28 @@
 (ns beholder.handlers
-  (:require [beholder.helpers :refer [fetch-remote-resource remote-resource-exists?]]
-            [beholder.model :as m]
-            [beholder.repositories.es :as es]
-            [beholder.repositories.k8s :as k8s]
-            [beholder.services.carrier :as carrier]
-            [beholder.template :as tmpl]
-            [clojure.string :refer [split]]
-            [clojure.string :as str]
-            [compojure.core :refer :all]
-            [compojure.route :as route]
-            [ring.middleware.defaults :refer [wrap-defaults]]
-            [ring.util.http-response :refer :all]
-            [taoensso.timbre :as log]))
+  (:require
+   [beholder.helpers :refer [fetch-remote-resource remote-resource-exists?]]
+   [beholder.model :as m]
+   [beholder.repositories.es :as es]
+   [beholder.repositories.k8s :as k8s]
+   [beholder.services.carrier :as carrier]
+   [beholder.template :as tmpl]
+   [clojure.string :refer [split]]
+   [clojure.string :as str]
+   [compojure.core :refer :all]
+   [compojure.route :as route]
+   [ring.middleware.defaults :refer [wrap-defaults]]
+   [ring.util.http-response :refer :all]
+   [taoensso.timbre :as log]))
 
 ;; ------------------------------------------------------------
 
-;(indexer/start)
+;; (indexer/start)
 
-;; ------------------------------------------------------------
+
 
 (defroutes app-routes
-           (route/resources "/static")
+
+  (route/resources "/static")
 
            ;; ------------------------------------------------------------
            ;; DASHBOARD
@@ -61,17 +63,17 @@
 
            (context "/service/:id" [id]
              (GET "/config" [status]
-               (let [beholder-conf (es/get-beholder-config!)
-                     service-conf (es/get-service-config id)
-                     k8s-service (k8s/get-service! id)
-                     ; ----------
-                     openapi-url (m/get-openapi-url beholder-conf k8s-service service-conf)
-                     openapi-label (m/get-openapi-label beholder-conf)
-                     openapi-supported? (:openApiEnabled? k8s-service)
-                     ; ----------
-                     asyncapi-url (m/get-asyncapi-url beholder-conf k8s-service service-conf)
-                     asyncapi-label (m/get-asyncapi-label beholder-conf)
-                     asyncapi-supported? (:asyncApiEnabled? k8s-service)]
+                  (let [beholder-conf       (es/get-beholder-config!)
+                        service-conf        (es/get-service-config id)
+                        k8s-service         (k8s/get-service! id)
+                                        ; ----------
+                        openapi-url         (m/get-openapi-url beholder-conf k8s-service service-conf)
+                        openapi-label       (m/get-openapi-label beholder-conf)
+                        openapi-supported?  (:openApiEnabled? k8s-service)
+                                        ; ----------
+                        asyncapi-url        (m/get-asyncapi-url beholder-conf k8s-service service-conf)
+                        asyncapi-label      (m/get-asyncapi-label beholder-conf)
+                        asyncapi-supported? (:asyncApiEnabled? k8s-service)]
                  (ok (tmpl/html "service-config.html"
                                 {:status   status
                                  :service  k8s-service
@@ -87,12 +89,12 @@
 
              (POST "/config" [openApiPath asyncApiPath team repo description]
                (as->
-                 (m/map->ServiceConfig {:serviceId    id
-                                        :openApiPath  openApiPath
-                                        :asyncApiPath asyncApiPath
-                                        :team         team
-                                        :repo         repo
-                                        :description  description}) v
+                   (m/map->ServiceConfig {:serviceId    id
+                                          :openApiPath  openApiPath
+                                          :asyncApiPath asyncApiPath
+                                          :team         team
+                                          :repo         repo
+                                          :description  description}) v
                  (es/save-service-config! v)
                  (str "/service/" id "/config?status=success")
                  (moved-permanently v))))
@@ -103,13 +105,13 @@
 
            (context "/service/:id/doc/openapi" [id]
              (GET "/" []
-               (ok (tmpl/html "openapi-ui.html" {:id id})))
+                  (ok (tmpl/html "openapi-ui.html" {:id id})))
 
              (GET "/proxy" []
-               (let [beholder-conf (es/get-beholder-config!)
-                     service-conf (es/get-service-config id)
-                     k8s-service (k8s/get-service! id)
-                     api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)]
+                  (let [beholder-conf (es/get-beholder-config!)
+                        service-conf  (es/get-service-config id)
+                        k8s-service   (k8s/get-service! id)
+                        api-doc-url   (m/get-openapi-url beholder-conf k8s-service service-conf)]
                  (log/info "Requesting OpenAPI doc from" api-doc-url)
                  (fetch-remote-resource api-doc-url))))
 
@@ -119,10 +121,10 @@
 
            (context "/service/:id/doc/asyncapi" [id]
              (GET "/" []
-               (ok (tmpl/html "asyncapi-ui.html" {:id id})))
+                  (ok (tmpl/html "asyncapi-ui.html" {:id id})))
 
              (GET "/proxy" []
-               (if-let [service-doc (es/get-service-documentation! id)]
+                  (if-let [service-doc (es/get-service-documentation! id)]
                  (->
                    (get-in service-doc [:asyncApiDoc :body])
                    (str/replace #"css/global.min.css" "/static/asyncapi/global.min.css")
