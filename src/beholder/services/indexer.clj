@@ -29,13 +29,9 @@
 (defn- generate-asyncapi-doc []
   (let [global-config (es/get-beholder-config!)]
     (->>
-        ;; get all carrier models with async api enabled
         (carrier/list-carriers! :asyncApiEnabled?)
-        ;; generate url underwhich async api doc can be found
         (map #(generate-asyncapi-url % global-config))
-        ;; load index file of the asyncapi documentation
         (map fetch-asyncapi-index-file)
-        ;;
         (map save-service-doc)
         (map mark-service-conf-as-cached)
         (map es/save-service-config!))))
