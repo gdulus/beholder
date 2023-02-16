@@ -34,8 +34,6 @@
 ; ----------------------------------------------------------------
 
 (defn- get-by-id [url]
-  "Safe return of the data. When searching by id ES throw 404 when not found.
-  This method prevents 404 exception but allows propagation of other issues"
   (try
     (-> (e/request @c {:url url})
         (get-in [:body :_source]))
@@ -50,9 +48,9 @@
 
 (defn validate-and-save [url model-class model-data]
   (->>
-    (s/validate model-class model-data)
-    (assoc {:method :put :url url} :body)
-    (e/request @c))
+   (s/validate model-class model-data)
+   (assoc {:method :put :url url} :body)
+   (e/request @c))
   model-data)
 
 ; ----------------------------------------------------------------
@@ -77,12 +75,11 @@
 
 (defn list-service-configs []
   (as->
-    (e/request @c {:url [:services-config :_search]}) v
+   (e/request @c {:url [:services-config :_search]}) v
     (get-in v [:body :hits :hits])
     (map :_source v)
     (map m/map->ServiceConfig v)
     (map #(s/validate ServiceConfig %) v)))
-
 
 (defn get-service-config [id]
   (get-by-id-and-validate [:services-config :_doc id]
@@ -107,4 +104,3 @@
   (validate-and-save [:services-documentation :_doc (:serviceId doc)]
                      ServiceDocumentation
                      doc))
-

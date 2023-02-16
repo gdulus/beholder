@@ -4,7 +4,8 @@
             [environ.core :refer [env]]
             [kubernetes-api.core :as k8s]
             [schema.core :as s]
-            [taoensso.timbre :as log])
+            [taoensso.timbre :as log]
+            [clojure.instant :as instant])
   (:import (beholder.model KubernetesService)))
 
 (def ^:private k8s (delay (k8s/client (env :k8s-apiserver)
@@ -39,13 +40,14 @@
 (defn- response->KubernetesService [list-resource openapi-label asyncapi-label]
   (let [labels (get-in list-resource [:metadata :labels])]
     (m/->KubernetesService
-      (get-in list-resource [:metadata :uid])
-      (get-in list-resource [:metadata :name])
-      (get-in list-resource [:metadata :namespace])
-      (build-url list-resource)
-      labels
-      (contains? labels openapi-label)
-      (contains? labels asyncapi-label))))
+     (get-in list-resource [:metadata :uid])
+     (get-in list-resource [:metadata :name])
+     (get-in list-resource [:metadata :namespace])
+     (build-url list-resource)
+     labels
+     (contains? labels openapi-label)
+     (contains? labels asyncapi-label)
+     (instant/read-instant-date (get-in list-resource [:metadata :creationTimestamp])))))
 
 (defn- validate-KubernetesService [service]
   (s/validate KubernetesService service))
@@ -58,15 +60,18 @@
         asyncapi-label (m/get-asyncapi-label config)
         namespaces (m/get-namespaces config)]
     (->>
-      (map load-k8s-services namespaces)
-      (mapcat :items)
-      (filter valid-service?)
-      (map #(response->KubernetesService % openapi-label asyncapi-label))
-      (map validate-KubernetesService)
-      (filter doc-enabled?))))
+     (map load-k8s-services namespaces)
+     (mapcat :items)
+     (filter valid-service?)
+     (map #(response->KubernetesService % openapi-label asyncapi-label))
+     (map validate-KubernetesService)
+     (filter doc-enabled?))))
 
 (defn get-service! [id]
   (->>
-    (list-services!)
-    (filter #(= id (:id %)))
-    (first)))
+   (list-services!)
+   (filter #(= id (:id %)))
+   (first)))
+
+(load-k8s-services "default")
+(list-services!)

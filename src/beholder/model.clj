@@ -3,6 +3,7 @@
             [schema.core :as s]))
 
 (def ^:private url (s/pred #(re-matches #"(www|http:|https:)+[^\s]+[\w]" %)))
+(def ^:private timestamp (s/pred inst?))
 (def ^:private ^:const default-namespace ["default"])
 (def ^:private ^:const default-openapi-label :openapi)
 (def ^:private ^:const default-openapi-path "api/openapi.yml")
@@ -22,7 +23,8 @@
                                 url :- url
                                 labels :- (s/maybe {s/Keyword s/Str})
                                 openApiEnabled? :- s/Bool
-                                asyncApiEnabled? :- s/Bool])
+                                asyncApiEnabled? :- s/Bool
+                                creationTimestamp :- timestamp])
 
 ; --------------------------------------------------------------
 
@@ -65,10 +67,11 @@
                             repo :- (s/maybe s/Str)
                             description :- (s/maybe s/Str)
                             openApiCached? :- (s/maybe s/Bool)
-                            asyncApiCached? :- (s/maybe s/Bool)])
+                            openApiVersion :- (s/maybe s/Str)
+                            asyncApiCached? :- (s/maybe s/Bool)
+                            asyncApiVersion :- (s/maybe s/Str)])
 
 ; --------------------------------------------------------------
-
 
 (s/defrecord AsyncApiDocumentation [version :- s/Str
                                     body :- s/Str])
@@ -78,7 +81,6 @@
                                    asyncApiDoc :- (s/maybe AsyncApiDocumentation)])
 
 ; --------------------------------------------------------------
-
 
 (s/defrecord Carrier [serviceId :- s/Str
                       name :- s/Str
