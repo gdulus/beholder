@@ -17,17 +17,6 @@
 
 ; --------------------------------------------------------------
 
-(s/defrecord KubernetesService [id :- s/Str
-                                name :- s/Str
-                                namespace :- s/Str
-                                url :- url
-                                labels :- (s/maybe {s/Keyword s/Str})
-                                openApiEnabled? :- s/Bool
-                                asyncApiEnabled? :- s/Bool
-                                creationTimestamp :- timestamp])
-
-; --------------------------------------------------------------
-
 (defprotocol DefaultValuesAware
   (get-namespaces [x])
   (get-openapi-label [x])
@@ -59,17 +48,28 @@
     (if (str/blank? asyncApiPath) default-asyncapi-path asyncApiPath)))
 
 ; --------------------------------------------------------------
+; K8SService
+; --------------------------------------------------------------
 
-(s/defrecord ServiceConfig [serviceId :- s/Str
-                            openApiPath :- (s/maybe s/Str)
-                            asyncApiPath :- (s/maybe s/Str)
-                            team :- (s/maybe s/Str)
-                            repo :- (s/maybe s/Str)
-                            description :- (s/maybe s/Str)
-                            openApiCached? :- (s/maybe s/Bool)
-                            openApiVersion :- (s/maybe s/Str)
-                            asyncApiCached? :- (s/maybe s/Bool)
-                            asyncApiVersion :- (s/maybe s/Str)])
+(s/defrecord K8SServiceConfig [openApiPath :- (s/maybe s/Str)
+                               asyncApiPath :- (s/maybe s/Str)
+                               team :- (s/maybe s/Str)
+                               repo :- (s/maybe s/Str)
+                               description :- (s/maybe s/Str)
+                               openApiCached? :- (s/maybe s/Bool)
+                               openApiVersion :- (s/maybe s/Str)
+                               asyncApiCached? :- (s/maybe s/Bool)
+                               asyncApiVersion :- (s/maybe s/Str)])
+
+(s/defrecord K8SService [id :- s/Str
+                         name :- s/Str
+                         namespace :- s/Str
+                         url :- url
+                         labels :- (s/maybe {s/Keyword s/Str})
+                         openApiEnabled? :- s/Bool
+                         asyncApiEnabled? :- s/Bool
+                         resourceVersion :- s/Int
+                         creationTimestamp :- timestamp])
 
 ; --------------------------------------------------------------
 
@@ -86,8 +86,8 @@
                       name :- s/Str
                       openApiEnabled? :- s/Bool
                       asyncApiEnabled? :- s/Bool
-                      config :- (s/maybe ServiceConfig)
-                      k8sService :- (s/maybe KubernetesService)])
+                      config :- (s/maybe K8SServiceConfig)
+                      k8sService :- (s/maybe K8SService)])
 
 ; --------------------------------------------------------------
 

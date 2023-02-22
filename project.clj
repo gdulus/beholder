@@ -1,8 +1,7 @@
 (defproject beholder "0.1.0"
   :description "Documentation search engine with K8S first approach."
   :license {:name "MIT License" :url "https://opensource.org/licenses/MIT"}
-  :dependencies [
-                 ;; -------------- base -----------------------------------
+  :dependencies [;; -------------- base -----------------------------------
                  [org.clojure/clojure "1.11.1"]
                  [prismatic/schema "1.4.1"]
                  [jarohen/chime "0.3.3"]
@@ -31,12 +30,10 @@
 
                  ;; --------------- logging ------------------------------
                  [com.taoensso/timbre "6.0.4"]]
-  :plugins [
-            [lein-environ "1.2.0"]                          ; make sure to change intellij repl run options to "run it with lein"
+  :plugins [[lein-environ "1.2.0"]                          ; make sure to change intellij repl run options to "run it with lein"
             [lein-ring "0.12.6"]
             [lein-eftest "0.6.0"]]
   :profiles {:kaocha {:dependencies [[lambdaisland/kaocha "1.75.1190"]]}}
   :aliases {"ktest" ["with-profile" "+kaocha" "run" "-m" "kaocha.runner" "--reporter" "kaocha.report.progress/report"]}
   :repl-options {:init-ns beholder.handlers}
-  :ring {:handler beholder.handlers/app
-         :nrepl   {:start? true :port 41111}})
+  :ring {:handler beholder.handlers/app})

@@ -32,30 +32,30 @@
   (testing "Test get-openapi-url"
     (is (= "/api/openapi.yml"
            (m/get-openapi-url (m/map->BeholderConfig {})
-                              (m/map->KubernetesService {})
-                              (m/map->ServiceConfig {}))))
+                              (m/map->K8SService {})
+                              (m/map->K8SServiceConfig {}))))
 
     (is (= "http://test.com/api/openapi.yml"
            (m/get-openapi-url (m/map->BeholderConfig {})
-                              (m/map->KubernetesService {:url "http://test.com"})
-                              (m/map->ServiceConfig {}))))
+                              (m/map->K8SService {:url "http://test.com"})
+                              (m/map->K8SServiceConfig {}))))
 
     (is (= "http://test.com/api/global.openapi.yml"
            (m/get-openapi-url (m/map->BeholderConfig {:openApiPath "api/global.openapi.yml"})
-                              (m/map->KubernetesService {:url "http://test.com"})
-                              (m/map->ServiceConfig {}))))
+                              (m/map->K8SService {:url "http://test.com"})
+                              (m/map->K8SServiceConfig {}))))
 
     (is (= "http://test.com/api/local.openapi.yml"
            (m/get-openapi-url (m/map->BeholderConfig {:openApiPath "api/global.openapi.yml"})
-                              (m/map->KubernetesService {:url "http://test.com"})
-                              (m/map->ServiceConfig {:openApiPath "api/local.openapi.yml"}))))
+                              (m/map->K8SService {:url "http://test.com"})
+                              (m/map->K8SServiceConfig {:openApiPath "api/local.openapi.yml"}))))
 
     (is (= "http://test.com/api/local.openapi.yml"
            (m/get-openapi-url (m/map->BeholderConfig {})
-                              (m/map->KubernetesService {:url "http://test.com"})
-                              (m/map->ServiceConfig {:openApiPath "api/local.openapi.yml"}))))
+                              (m/map->K8SService {:url "http://test.com"})
+                              (m/map->K8SServiceConfig {:openApiPath "api/local.openapi.yml"}))))
 
     (is (= "http://test.com/api/local.openapi.yml"
            (m/get-openapi-url (m/map->BeholderConfig {})
-                              (m/map->KubernetesService {:url "http://test.com"})
-                              (m/map->ServiceConfig {:openApiPath "//api///local.openapi.yml"}))))))
+                              (m/map->K8SService {:url "http://test.com"})
+                              (m/map->K8SServiceConfig {:openApiPath "//api///local.openapi.yml"}))))))

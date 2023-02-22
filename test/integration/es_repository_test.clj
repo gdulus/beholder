@@ -46,36 +46,36 @@
 
       (testing "When no ServiceConfig entries get-service-config should return nil"
         (is (some? (r/create-indexes!)))
-        (is (nil? (r/get-service-config 123)))
+        (is (nil? (r/get-service-config! 123)))
         (is (some? (r/delete-indexes!))))
 
       (testing "When saved ServiceConfig get-service-config should return it"
-        (let [service-config (m/->ServiceConfig "123" "path/openapi" "path/asyncapi" "my team" "path/repo" "my description" false false)]
+        (let [service-config (m/->K8SServiceConfig "123" "path/openapi" "path/asyncapi" "my team" "path/repo" "my description" false false)]
           (is (some? (r/create-indexes!)))
           (is (= service-config (r/save-service-config! service-config)))
           (wait)
-          (is (= service-config (r/get-service-config "123")))
+          (is (= service-config (r/get-service-config! "123")))
           (is (some? (r/delete-indexes!)))))
 
       (testing "When saved ServiceConfig list-service-configs should return without duplicates"
-        (let [sc1v1 (m/->ServiceConfig "1" "path/openapi1" "path/asyncapi1" "my team1" "path/repo1" "my description1" false false)
-              sc1v2 (m/->ServiceConfig "1" "path/openapi1v2" "path/asyncapi1v2" "my team1v2" "path/repo1v2" "my description1v2" false false)
-              sc2v1 (m/->ServiceConfig "2" "path/openapi2" "path/asyncapi2" "my team2" "path/repo2" "my description2" false false)]
+        (let [sc1v1 (m/->K8SServiceConfig "1" "path/openapi1" "path/asyncapi1" "my team1" "path/repo1" "my description1" false false)
+              sc1v2 (m/->K8SServiceConfig "1" "path/openapi1v2" "path/asyncapi1v2" "my team1v2" "path/repo1v2" "my description1v2" false false)
+              sc2v1 (m/->K8SServiceConfig "2" "path/openapi2" "path/asyncapi2" "my team2" "path/repo2" "my description2" false false)]
           (is (some? (r/create-indexes!)))
 
           (is (= sc1v1 (r/save-service-config! sc1v1)))
           (wait)
-          (is (= 1 (count (r/list-service-configs))))
+          (is (= 1 (count (r/list-service-configs!))))
 
           (is (= sc2v1 (r/save-service-config! sc2v1)))
           (wait)
-          (is (= 2 (count (r/list-service-configs))))
+          (is (= 2 (count (r/list-service-configs!))))
 
           (is (= sc1v2 (r/save-service-config! sc1v2)))
           (wait)
-          (is (= 2 (count (r/list-service-configs))))
-          (is (= sc1v2 (first (filter #(= (:serviceId %) "1") (r/list-service-configs)))))
-          (is (= sc2v1 (first (filter #(= (:serviceId %) "2") (r/list-service-configs)))))
+          (is (= 2 (count (r/list-service-configs!))))
+          (is (= sc1v2 (first (filter #(= (:serviceId %) "1") (r/list-service-configs!)))))
+          (is (= sc2v1 (first (filter #(= (:serviceId %) "2") (r/list-service-configs!)))))
 
           (is (some? (r/delete-indexes!)))))
 

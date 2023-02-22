@@ -19,3 +19,4 @@
     (catch Exception e
       (log/warn "Error while loading resource")
       "")))
+
