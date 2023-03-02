@@ -16,3 +16,5 @@ pom.xml.asc
 /utils/mock-docu-service/target
 /utils/mock-docu-service/.lein-*
 /.*
+/.clj-kondo
+/.lsp

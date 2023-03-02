@@ -4,7 +4,7 @@
             [clojure.data.json :as json]
             [environ.core :refer [env]]
             [schema.core :as s]
-            [taoensso.timbre :as log])
+            [beholder.utils.log :as log])
   (:import (beholder.model AsyncApiDocumentation)))
 
 (def ^:private url (env :asyncapi-generator-service))
@@ -28,7 +28,7 @@
 (defn get-index-file [src]
   (let [{id "id" version "version"} (create-documentation src)]
     (as-> (get-file id version "/index.html") v
-          (get v "body")
-          {:version version :body v}
-          (m/map->AsyncApiDocumentation v)
-          (s/validate AsyncApiDocumentation v))))
+      (get v "body")
+      {:version version :body v}
+      (m/map->AsyncApiDocumentation v)
+      (s/validate AsyncApiDocumentation v))))

@@ -5,7 +5,7 @@
    [beholder.repositories.es :as es]
    [beholder.services.carrier :as carrier]
    [chime.core :refer [chime-at periodic-seq]]
-   [taoensso.timbre :as log])
+   [beholder.utils.log :as log])
   (:import
    (java.time Duration Instant)))
 

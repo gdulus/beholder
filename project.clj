@@ -4,7 +4,6 @@
   :dependencies [;; -------------- base -----------------------------------
                  [org.clojure/clojure "1.11.1"]
                  [prismatic/schema "1.4.1"]
-                 [jarohen/chime "0.3.3"]
                  ;; -------------- k8s -----------------------------------
                  [nubank/k8s-api "0.1.2"]
                  [io.fabric8/kubernetes-client "6.3.1"]
@@ -29,7 +28,8 @@
                  [ring/ring-mock "0.4.0"]
 
                  ;; --------------- logging ------------------------------
-                 [com.taoensso/timbre "6.0.4"]]
+                 ;[com.taoensso/timbre "6.0.4"]
+                 ]
   :plugins [[lein-environ "1.2.0"]                          ; make sure to change intellij repl run options to "run it with lein"
             [lein-ring "0.12.6"]
             [lein-eftest "0.6.0"]]

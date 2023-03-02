@@ -1,17 +1,17 @@
 (ns beholder.handlers
-  (:require [beholder.helpers :refer [fetch-remote-resource remote-resource-exists?]]
-            [beholder.model :as m]
-            [beholder.repositories.es :as es]
-            [beholder.services.carrier :as carrier]
-            [beholder.services.k8s-service :as k8s]
-            [beholder.template :as tmpl]
-            [clojure.string :refer [split]]
-            [clojure.string :as str]
-            [compojure.core :refer :all]
-            [compojure.route :as route]
-            [ring.middleware.defaults :refer [wrap-defaults]]
-            [ring.util.http-response :refer :all]
-            [taoensso.timbre :as log]))
+  #_{:clj-kondo/ignore [:refer-all]}
+  (:require
+   [beholder.helpers :refer [fetch-remote-resource remote-resource-exists?]]
+   [beholder.model :as m]
+   [beholder.repositories.es :as es]
+   [beholder.services.carrierl :as carrier]
+   [beholder.services.k8s-service :as k8s]
+   [beholder.template :as tmpl]
+   [beholder.utils.log :as log]
+   [clojure.string :refer [replace split]]
+   [compojure.core :refer :all]   [compojure.route :as route]
+   [ring.middleware.defaults :refer [wrap-defaults]]
+   [ring.util.http-response :refer :all]))
 
 ;; ------------------------------------------------------------
 ;; Indexers
@@ -129,9 +129,9 @@
       (if-let [service-doc (es/get-service-documentation! id)]
         (->
          (get-in service-doc [:asyncApiDoc :body])
-         (str/replace #"css/global.min.css" "/static/asyncapi/global.min.css")
-         (str/replace #"css/asyncapi.min.css" "/static/asyncapi/asyncapi.min.css")
-         (str/replace #"js/asyncapi-ui.min.js" "/static/asyncapi/asyncapi-ui.min.js")))))
+         (replace #"css/global.min.css" "/static/asyncapi/global.min.css")
+         (replace #"css/asyncapi.min.css" "/static/asyncapi/asyncapi.min.css")
+         (replace #"js/asyncapi-ui.min.js" "/static/asyncapi/asyncapi-ui.min.js")))))
 
            ;; ------------------------------------------------------------
            ;; OTHER

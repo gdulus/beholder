@@ -5,15 +5,13 @@
             [environ.core :refer [env]]
             [qbits.spandex :as e]
             [schema.core :as s]
-            [taoensso.timbre :refer [spy]]
-            [taoensso.timbre]
-            [taoensso.timbre :as log])
+            [beholder.utils.log :as log])
   (:import (beholder.model BeholderConfig K8SService K8SServiceConfig ServiceDocumentation)))
 
 (defn config []
-  (spy :info
-       "Creating ElasticSearch connection to hosts"
-       {:hosts (str/split (env :es-hosts) #",")}))
+  (log/spy :info
+           "ElasticSearch connection to hosts"
+           {:hosts (str/split (env :es-hosts) #",")}))
 
 (def ^:private c (delay (e/client (config))))
 

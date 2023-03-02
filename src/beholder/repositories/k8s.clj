@@ -5,7 +5,7 @@
             [environ.core :refer [env]]
             [kubernetes-api.core :as k8s]
             [schema.core :as s]
-            [taoensso.timbre :as log])
+            [beholder.utils.log :as log])
   (:import (beholder.model K8SService)))
 
 (def ^:private k8s (delay (k8s/client (env :k8s-apiserver)
@@ -40,15 +40,15 @@
 (defn- response->K8SService [list-resource openapi-label asyncapi-label]
   (let [labels (get-in list-resource [:metadata :labels])]
     (m/->K8SService
-      (get-in list-resource [:metadata :uid])
-      (get-in list-resource [:metadata :name])
-      (get-in list-resource [:metadata :namespace])
-      (build-url list-resource)
-      labels
-      (contains? labels openapi-label)
-      (contains? labels asyncapi-label)
-      (Integer/parseInt (get-in list-resource [:metadata :resourceVersion]))
-      (instant/read-instant-date (get-in list-resource [:metadata :creationTimestamp])))))
+     (get-in list-resource [:metadata :uid])
+     (get-in list-resource [:metadata :name])
+     (get-in list-resource [:metadata :namespace])
+     (build-url list-resource)
+     labels
+     (contains? labels openapi-label)
+     (contains? labels asyncapi-label)
+     (Integer/parseInt (get-in list-resource [:metadata :resourceVersion]))
+     (instant/read-instant-date (get-in list-resource [:metadata :creationTimestamp])))))
 
 (defn- validate-K8SService [service]
   (s/validate K8SService service))
@@ -61,9 +61,9 @@
         asyncapi-label (m/get-asyncapi-label config)
         namespaces (m/get-namespaces config)]
     (->>
-      (map load-k8s-services namespaces)
-      (mapcat :items)
-      (filter valid-service?)
-      (map #(response->K8SService % openapi-label asyncapi-label))
-      (map validate-K8SService)
-      (filter doc-enabled?))))
+     (map load-k8s-services namespaces)
+     (mapcat :items)
+     (filter valid-service?)
+     (map #(response->K8SService % openapi-label asyncapi-label))
+     (map validate-K8SService)
+     (filter doc-enabled?))))

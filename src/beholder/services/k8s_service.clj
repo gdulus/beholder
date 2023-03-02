@@ -4,7 +4,7 @@
    [beholder.repositories.k8s :as k8s]
    [chime.core :refer [chime-at periodic-seq]]
    [clojure.data :as data]
-   [taoensso.timbre :as log])
+   [beholder.utils.log :as log])
   (:import
    (java.time Duration Instant)))
 
