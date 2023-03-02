@@ -8,12 +8,12 @@
   (:import
    (java.time Duration Instant)))
 
-(defn- to-be-deleted [persisted cluster]
+(defn- filter-to-be-deleted [persisted cluster]
   (let [a (map :id persisted)
         b (map :id cluster)]
     (filter some? (first (data/diff a b)))))
 
-(defn- to-be-persisted [persisted cluster]
+(defn- filter-to-be-persisted [persisted cluster]
   (let [extractor (fn [e] {(:id e) (:resourceVersion e)})
         transofrmer #(into {} (map extractor %))
         a (transofrmer persisted)]
@@ -23,17 +23,15 @@
                (or (nil? p-version)
                    (> c-version p-version))) cluster)))
 
-(defn- index-k8s-services! []
-  (let [found-in-cluster (k8s/fetch-services!)
-        found-persisted (es/list-k8s-service!)
-        to-be-persisted (to-be-persisted found-persisted found-in-cluster)
-        to-be-deleted (to-be-deleted found-persisted found-in-cluster)]
+(defn- index-k8s-services! [cluster-k8s-srv-provider stored-k8s-srv-provider]
+  (let [found-in-cluster (cluster-k8s-srv-provider)
+        found-persisted (stored-k8s-srv-provider)
+        to-be-persisted (filter-to-be-persisted found-persisted found-in-cluster)
+        to-be-deleted (filter-to-be-deleted found-persisted found-in-cluster)]
     {:found-in-cluster (count found-in-cluster)
      :found-persisted (count found-persisted)
      :persisted (count (map es/save-k8s-service! to-be-persisted))
      :deleted (count (map es/delete-k8s-service! to-be-deleted))}))
-
-;(index-k8s-services!)
 
 (defn start-indexer []
   (let [now (Instant/now)
@@ -42,9 +40,9 @@
        (chime-at (periodic-seq now new-binding)
                  (fn [_]
                    (log/info "Executing K8S service indexing")
-                   (let [s (index-k8s-services!)]
+                   (let [report (index-k8s-services! k8s/fetch-services! es/list-k8s-service!)]
                      (try
-                       (log/info (str "Indexed " (count s) " k8s services"))
+                       (log/info "Indexing executed with result:" report)
                        (catch Exception e
                          (log/error "There was an error while indexing K8S services" e))))))))
 

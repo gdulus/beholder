@@ -4,7 +4,7 @@
    [beholder.helpers :refer [fetch-remote-resource remote-resource-exists?]]
    [beholder.model :as m]
    [beholder.repositories.es :as es]
-   [beholder.services.carrierl :as carrier]
+   [beholder.services.carrier :as carrier]
    [beholder.services.k8s-service :as k8s]
    [beholder.template :as tmpl]
    [beholder.utils.log :as log]
@@ -97,7 +97,7 @@
                                  :team         team
                                  :repo         repo
                                  :description  description}) v
-        (es/save-service-config! v)
+        (es/save-service-config! 1 v)
         (str "/service/" id "/config?status=success")
         (moved-permanently v))))
 
