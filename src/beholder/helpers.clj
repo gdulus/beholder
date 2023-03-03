@@ -15,7 +15,7 @@
 
 (defn fetch-remote-resource [url]
   (try
-client/get url)
+    (client/get url)
     (catch Exception _
       (log/warn "Error while loading resource")
       "")))

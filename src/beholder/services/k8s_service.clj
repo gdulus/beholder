@@ -8,39 +8,41 @@
   (:import
    (java.time Duration Instant)))
 
-(defn- filter-to-be-deleted [persisted cluster]
-  (let [a (map :id persisted)
-        b (map :id cluster)]
-    (filter some? (first (data/diff a b)))))
+(defn- find-removed [srv-local srv-cluster]
+  (let [lcl (map :id srv-local)
+        cls (map :id srv-cluster)]
+    (filter some? (first (data/diff lcl cls)))))
 
-(defn- filter-to-be-persisted [persisted cluster]
+(defn- find-changed [srv-local srv-cluster]
   (let [extractor (fn [e] {(:id e) (:resourceVersion e)})
         transofrmer #(into {} (map extractor %))
-        a (transofrmer persisted)]
-    (filter #(let [c-version (get % :resourceVersion)
-                   c-id (get % :id)
-                   p-version (get a c-id)]
-               (or (nil? p-version)
-                   (> c-version p-version))) cluster)))
+        lcl (transofrmer srv-local)]
+    (filter #(let [cls-version (get % :resourceVersion)
+                   cls-id (get % :id)
+                   lcl-version (get lcl cls-id)]
+               (or (nil? lcl-version) (> cls-version lcl-version)))
+            srv-cluster)))
 
-(defn- index-k8s-services! [cluster-k8s-srv-provider stored-k8s-srv-provider]
-  (let [found-in-cluster (cluster-k8s-srv-provider)
-        found-persisted (stored-k8s-srv-provider)
-        to-be-persisted (filter-to-be-persisted found-persisted found-in-cluster)
-        to-be-deleted (filter-to-be-deleted found-persisted found-in-cluster)]
-    {:found-in-cluster (count found-in-cluster)
-     :found-persisted (count found-persisted)
-     :persisted (count (map es/save-k8s-service! to-be-persisted))
-     :deleted (count (map es/delete-k8s-service! to-be-deleted))}))
+(defn- index-k8s-services [ctx]
+  (let [cluster-k8s-srv-provider-fn (:cluster-k8s-srv-provider-fn ctx)
+        local-k8s-srv-provider-fn (:local-k8s-srv-provider-fn ctx)
+        changed-k8s-srv-fn (:changed-k8s-srv-fn ctx)
+        removed-k8s-srv-fn (:removed-k8s-srv-fn ctx)
+        srv-cluster (cluster-k8s-srv-provider-fn)
+        srv-local (local-k8s-srv-provider-fn)
+        srv-changed (find-changed srv-local srv-cluster)
+        srv-removed (find-removed srv-local srv-cluster)]
+    {:srv-changed (map changed-k8s-srv-fn srv-changed)
+     :srv-removed (map removed-k8s-srv-fn srv-removed)}))
 
-(defn start-indexer []
+(defn start-indexer! []
   (let [now (Instant/now)
         period (Duration/ofSeconds 10)
         new-binding period] (log/info "Setting up indexer. First execution will happen on " now " and will repeat every " new-binding)
        (chime-at (periodic-seq now new-binding)
                  (fn [_]
                    (log/info "Executing K8S service indexing")
-                   (let [report (index-k8s-services! k8s/fetch-services! es/list-k8s-service!)]
+                   (let [report (index-k8s-services {})]
                      (try
                        (log/info "Indexing executed with result:" report)
                        (catch Exception e
