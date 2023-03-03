@@ -42,7 +42,10 @@
        (chime-at (periodic-seq now new-binding)
                  (fn [_]
                    (log/info "Executing K8S service indexing")
-                   (let [report (index-k8s-services {})]
+                   (let [report (index-k8s-services {:cluster-k8s-srv-provider-fn k8s/fetch-services!
+                                                     :local-k8s-srv-provider-fn es/list-k8s-service!
+                                                     :changed-k8s-srv-fn es/save-k8s-service!
+                                                     :removed-k8s-srv-fn es/delete-k8s-service!})]
                      (try
                        (log/info "Indexing executed with result:" report)
                        (catch Exception e
