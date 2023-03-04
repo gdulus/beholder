@@ -35,21 +35,25 @@
     {:srv-changed (map changed-k8s-srv-fn srv-changed)
      :srv-removed (map removed-k8s-srv-fn srv-removed)}))
 
-(defn start-indexer! []
+; ---------------------------------------------------------
+
+(defn start-periodic-indexing! []
   (let [now (Instant/now)
         period (Duration/ofSeconds 10)
-        new-binding period] (log/info "Setting up indexer. First execution will happen on " now " and will repeat every " new-binding)
-       (chime-at (periodic-seq now new-binding)
-                 (fn [_]
-                   (log/info "Executing K8S service indexing")
-                   (let [report (index-k8s-services {:cluster-k8s-srv-provider-fn k8s/fetch-services!
-                                                     :local-k8s-srv-provider-fn es/list-k8s-service!
-                                                     :changed-k8s-srv-fn es/save-k8s-service!
-                                                     :removed-k8s-srv-fn es/delete-k8s-service!})]
-                     (try
-                       (log/info "Indexing executed with result:" report)
-                       (catch Exception e
-                         (log/error "There was an error while indexing K8S services" e))))))))
+        new-binding period]
+    (log/info "Setting up indexer. First execution will happen on " now " and will repeat every " new-binding)
+    (chime-at (periodic-seq now new-binding)
+              (fn [_]
+                (log/info "Executing K8S service indexing")
+                (try
+                  (let [report (index-k8s-services {:cluster-k8s-srv-provider-fn k8s/fetch-services!
+                                                    :local-k8s-srv-provider-fn es/list-k8s-service!
+                                                    :changed-k8s-srv-fn es/save-k8s-service!
+                                                    :removed-k8s-srv-fn es/delete-k8s-service!})]
+
+                    (log/info "Indexing executed with result:" report))
+                  (catch Exception e
+                    (log/error "There was an error while indexing K8S services" e)))))))
 
 (defn get-k8s-service! [id]
   (es/get-k8s-service! id))
