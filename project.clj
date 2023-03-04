@@ -13,7 +13,7 @@
                  [jarohen/chime "0.3.3"]
                  ;; -------------- web -----------------------------------
                  [etaoin "1.0.39"]
-                 [compojure "1.6.3"]
+                 [compojure "1.7.0"]
                  [ring/ring-defaults "0.3.4"]
                  [ring-json-response "0.2.0"]
                  [metosin/ring-http-response "0.9.3"]
@@ -31,8 +31,7 @@
                  ;[com.taoensso/timbre "6.0.4"]
                  ]
   :plugins [[lein-environ "1.2.0"]                          ; make sure to change intellij repl run options to "run it with lein"
-            [lein-ring "0.12.6"]
-            [lein-eftest "0.6.0"]]
+            [lein-ring "0.12.6"]]
   :profiles {:kaocha {:dependencies [[lambdaisland/kaocha "1.75.1190"]]}}
   :aliases {"ktest" ["with-profile" "+kaocha" "run" "-m" "kaocha.runner" "--reporter" "kaocha.report.progress/report"]}
   :repl-options {:init-ns beholder.handlers}

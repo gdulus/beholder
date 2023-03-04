@@ -91,25 +91,20 @@
 ; K8SService
 ; ----------------------------------------------------------------
 
-(defn- doc->K8SService [doc]
-  (->>
-   (:creationTimestamp doc)
-   (instant/read-instant-date)
-   (assoc doc :creationTimestamp)
-   m/map->K8SService))
-
 (defn save-k8s-service! [config]
-  (save [:k8s-services :_doc (:id config)]
-        K8SService
-        config))
+  (let [now (java.time.Instant/now)
+        config (assoc config :lastUpdated now)]
+    (save [:k8s-services :_doc (:id config)]
+          K8SService
+          config)))
 
 (defn get-k8s-service! [id]
   (get [:k8s-services :_doc id]
        K8SService
-       doc->K8SService))
+       m/map->K8SService))
 
 (defn list-k8s-service! []
-  (list :k8s-services K8SService doc->K8SService))
+  (list :k8s-services K8SService m/map->K8SService))
 
 (defn delete-k8s-service! [id]
   (delete :k8s-services id))
