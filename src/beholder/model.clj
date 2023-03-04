@@ -18,11 +18,11 @@
 ; --------------------------------------------------------------
 
 (defprotocol DefaultValuesAware
-  (get-namespaces [x])
-  (get-openapi-label [x])
-  (get-openapi-path [x])
-  (get-asyncapi-label [x])
-  (get-asyncapi-path [x]))
+  (get-namespaces [_])
+  (get-openapi-label [_])
+  (get-openapi-path [_])
+  (get-asyncapi-label [_])
+  (get-asyncapi-path [_]))
 
 (s/defrecord BeholderConfig [namespaces :- (s/maybe [s/Str])
                              openApiLabel :- (s/maybe s/Str)
@@ -31,20 +31,20 @@
                              asyncApiPath :- (s/maybe s/Str)]
   DefaultValuesAware
 
-  (get-namespaces [x]
+  (get-namespaces [_]
     (let [namespaces (remove str/blank? namespaces)]
       (if (empty? namespaces) default-namespace namespaces)))
 
-  (get-openapi-label [x]
+  (get-openapi-label [_]
     (if (str/blank? openApiLabel) default-openapi-label (keyword openApiLabel)))
 
-  (get-openapi-path [x]
+  (get-openapi-path [_]
     (if (str/blank? openApiPath) default-openapi-path openApiPath))
 
-  (get-asyncapi-label [x]
+  (get-asyncapi-label [_]
     (if (str/blank? asyncApiLabel) default-asyncpi-label (keyword asyncApiLabel)))
 
-  (get-asyncapi-path [x]
+  (get-asyncapi-path [_]
     (if (str/blank? asyncApiPath) default-asyncapi-path asyncApiPath)))
 
 ; --------------------------------------------------------------
