@@ -61,6 +61,11 @@
                                asyncApiCached? :- (s/maybe s/Bool)
                                asyncApiVersion :- (s/maybe s/Str)])
 
+(s/defrecord K8SServiceDocumentation [serviceId :- s/Str
+                                      serviceVersion :- s/Int
+                                      openApiDoc :- (s/maybe s/Str)
+                                      asyncApiDoc :- (s/maybe s/Str)])
+
 (s/defrecord K8SService [id :- s/Str
                          name :- s/Str
                          namespace :- s/Str
@@ -69,7 +74,7 @@
                          openApiEnabled? :- s/Bool
                          asyncApiEnabled? :- s/Bool
                          resourceVersion :- s/Int
-                         creationTimestamp :- timestamp])
+                         lastUpdated :- (s/maybe timestamp)])
 
 ; --------------------------------------------------------------
 

@@ -1,7 +1,6 @@
 (ns beholder.repositories.k8s
   (:require [beholder.model :as m]
             [beholder.repositories.es :as es]
-            [clojure.instant :as instant]
             [environ.core :refer [env]]
             [kubernetes-api.core :as k8s]
             [schema.core :as s]
@@ -48,7 +47,7 @@
      (contains? labels openapi-label)
      (contains? labels asyncapi-label)
      (Integer/parseInt (get-in list-resource [:metadata :resourceVersion]))
-     (instant/read-instant-date (get-in list-resource [:metadata :creationTimestamp])))))
+     nil)))
 
 (defn- validate-K8SService [service]
   (s/validate K8SService service))
