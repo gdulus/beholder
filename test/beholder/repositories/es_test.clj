@@ -13,11 +13,14 @@
                                "ES_JAVA_OPTS"   "-Xms750m -Xmx750m"}
                :wait-for      {:wait-strategy   :log
                                :message         "\"message\": \"started\""
-                               :startup-timeout 15}})
+                               :startup-timeout 120}})
    (tc/start!)))
 
 (defn build-mocked-es-config [container]
   {:hosts [(str "http://" (:host container) ":" (get (:mapped-ports container) 9200))]})
+
+(defn sleep []
+  (Thread/sleep 1000))
 
 (deftest ^:integration testing-es-respository
   (let [container (start-container)]
@@ -37,8 +40,8 @@
 ;; ----
 ;;
       (testing "K8SService CRUD operations"
-        (testing "flow save and get"
-          (let [srv (m/map->K8SService {:id "123"
+        (testing "flow save -> get"
+          (let [srv (m/map->K8SService {:id "1"
                                         :name "test service"
                                         :namespace "default"
                                         :url "http://example.org"
@@ -58,11 +61,59 @@
                 last-updated-save (:lastUpdated save-result)
                 srv-saved (assoc srv :lastUpdated last-updated-save)
                 ; ----
-                load-result (es/get-k8s-service! "123")
+                load-result (es/get-k8s-service! "1")
                 last-updated-get (:lastUpdated load-result)
                 srv-get (assoc srv :lastUpdated last-updated-get)]
             (is (= save-result srv-saved))
-            (is (= load-result srv-get))))))
+            (is (= load-result srv-get))))
+
+        (testing "flow save, save -> list"
+          (let [srv1 (m/map->K8SService {:id "2"
+                                         :name "test service a"
+                                         :namespace "default"
+                                         :url "http://example.org"
+                                         :labels {:a "1" :b "2"}
+                                         :openApiEnabled? true
+                                         :asyncApiEnabled? true
+                                         :resourceVersion 666
+                                         :lastUpdated nil})
+                srv2 (m/map->K8SService {:id "3"
+                                         :name "test service b"
+                                         :namespace "default"
+                                         :url "http://example.org"
+                                         :labels {:a "1" :b "2"}
+                                         :openApiEnabled? true
+                                         :asyncApiEnabled? true
+                                         :resourceVersion 666
+                                         :lastUpdated nil})
+
+                _ (es/save-k8s-service! srv1)
+                _ (es/save-k8s-service! srv2)
+                _ (sleep)
+                result (es/list-k8s-service!)
+                result-ids (map :id result)]
+            (is (<= 2 (count result)))
+            (is (.contains result-ids "2"))
+            (is (.contains result-ids "3"))))
+
+        (testing "flow save -> get -> delete -> get"
+          (let [srv (m/map->K8SService {:id "4"
+                                        :name "test service a"
+                                        :namespace "default"
+                                        :url "http://example.org"
+                                        :labels {:a "1" :b "2"}
+                                        :openApiEnabled? true
+                                        :asyncApiEnabled? true
+                                        :resourceVersion 666
+                                        :lastUpdated nil})
+                _ (es/save-k8s-service! srv)
+                before-delete (es/get-k8s-service! "4")
+                _ (es/delete-k8s-service! "4")
+                _ (sleep)
+                afetr-delete (es/get-k8s-service! "4")]
+            (is (not (nil? before-delete)))
+            (is (nil? afetr-delete))))))
+
 ;; ---
     (tc/stop! container)
     (tc/perform-cleanup!)))
