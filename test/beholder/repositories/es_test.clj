@@ -38,19 +38,31 @@
 ;;
       (testing "K8SService CRUD operations"
         (testing "flow save and get"
-          (let [conf (m/map->K8SService {:id "123"
-                                         :name "test service"
-                                         :namespace "default"
-                                         :url "http://example.org"
-                                         :labels {:a "1" :b "2"}
-                                         :openApiEnabled? true
-                                         :asyncApiEnabled? true
-                                         :resourceVersion 666
-                                         :lastUpdated nil})
-                save-result (es/save-k8s-service! conf)
-                load-result (es/get-k8s-service! "123")]
-            (is (= save-result conf))
-            (is (= load-result conf))))))
+          (let [srv (m/map->K8SService {:id "123"
+                                        :name "test service"
+                                        :namespace "default"
+                                        :url "http://example.org"
+                                        :labels {:a "1" :b "2"}
+                                        :openApiEnabled? true
+                                        :asyncApiEnabled? true
+                                        :resourceVersion 666
+                                        :lastUpdated nil})
+                ; ---
+                ; Inst returned by save and date returned by get differ by miliseconds
+                ; First is using java api directly second uses istant/read-instant-date.
+                ;    example diff:
+                ;    save  #inst "2023-03-05T11:26:24.031-00:00"
+                ;    get   #inst "2023-03-05T11:26:24.000-00:00"
+                ; ---
+                save-result (es/save-k8s-service! srv)
+                last-updated-save (:lastUpdated save-result)
+                srv-saved (assoc srv :lastUpdated last-updated-save)
+                ; ----
+                load-result (es/get-k8s-service! "123")
+                last-updated-get (:lastUpdated load-result)
+                srv-get (assoc srv :lastUpdated last-updated-get)]
+            (is (= save-result srv-saved))
+            (is (= load-result srv-get))))))
 ;; ---
     (tc/stop! container)
     (tc/perform-cleanup!)))
