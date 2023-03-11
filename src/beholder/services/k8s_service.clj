@@ -39,7 +39,7 @@
 
 (defn start-periodic-indexing! []
   (let [now (Instant/now)
-        period (Duration/ofSeconds 10)
+        period (Duration/ofSeconds 60)
         new-binding period]
     (log/info "Setting up indexer. First execution will happen on " now " and will repeat every " new-binding)
     (chime-at (periodic-seq now new-binding)
