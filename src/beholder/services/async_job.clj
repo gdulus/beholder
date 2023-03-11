@@ -1,4 +1,4 @@
-(ns beholder.services.async-job-service
+(ns beholder.services.async-job
   (:require
    [schema.core :as s]))
 
