@@ -17,7 +17,7 @@
 ;; Indexers
 ;; ------------------------------------------------------------
 
-(k8s/start-periodic-indexing!)
+;; (k8s/start-periodic-indexing!)
 
 ;; ------------------------------------------------------------
 ;; Routes
@@ -65,16 +65,16 @@
 
   (context "/service/:id" [id]
     (GET "/config" [status]
-      (let [beholder-conf (es/get-beholder-config!)
-            service-conf (es/get-service-config! id)
-            k8s-service (k8s/get-k8s-service! id)
-                     ; ----------
-            openapi-url (m/get-openapi-url beholder-conf k8s-service service-conf)
-            openapi-label (m/get-openapi-label beholder-conf)
-            openapi-supported? (:openApiEnabled? k8s-service)
-                     ; ----------
-            asyncapi-url (m/get-asyncapi-url beholder-conf k8s-service service-conf)
-            asyncapi-label (m/get-asyncapi-label beholder-conf)
+      (let [beholder-conf       (es/get-beholder-config!)
+            service-conf        (es/get-service-config! id)
+            k8s-service         (k8s/get-k8s-service! id)
+                                        ; ----------
+            openapi-url         (m/get-openapi-url beholder-conf k8s-service service-conf)
+            openapi-label       (m/get-openapi-label beholder-conf)
+            openapi-supported?  (:openApiEnabled? k8s-service)
+                                        ; ----------
+            asyncapi-url        (m/get-asyncapi-url beholder-conf k8s-service service-conf)
+            asyncapi-label      (m/get-asyncapi-label beholder-conf)
             asyncapi-supported? (:asyncApiEnabled? k8s-service)]
         (ok (tmpl/html "service-config.html"
                        {:status   status
@@ -91,7 +91,7 @@
 
     (POST "/config" [openApiPath asyncApiPath team repo description]
       (as->
-       (m/map->K8SServiceConfig {:serviceId id
+       (m/map->K8SServiceConfig {:serviceId    id
                                  :openApiPath  openApiPath
                                  :asyncApiPath asyncApiPath
                                  :team         team
@@ -111,9 +111,9 @@
 
     (GET "/proxy" []
       (let [beholder-conf (es/get-beholder-config!)
-            service-conf (es/get-service-config! id)
-            k8s-service (k8s/get-k8s-service! id)
-            api-doc-url (m/get-openapi-url beholder-conf k8s-service service-conf)]
+            service-conf  (es/get-service-config! id)
+            k8s-service   (k8s/get-k8s-service! id)
+            api-doc-url   (m/get-openapi-url beholder-conf k8s-service service-conf)]
         (log/info "Requesting OpenAPI doc from" api-doc-url)
         (fetch-remote-resource api-doc-url))))
 
