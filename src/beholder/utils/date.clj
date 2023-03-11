@@ -17,3 +17,6 @@
   (->> (field m)
        (parse-str)
        (assoc m field)))
+
+(defn <=+ [a b]
+  (>= 0 (compare a b)))
