@@ -17,7 +17,7 @@
 ;; Indexers
 ;; ------------------------------------------------------------
 
-;(k8s/start-indexer)
+(k8s/start-periodic-indexing!)
 
 ;; ------------------------------------------------------------
 ;; Routes
@@ -155,4 +155,5 @@
                             :multipart  true
                             :nested     true
                             :keywordize true}})
-   wrap-exception))
+   ;wrap-exception
+   ))

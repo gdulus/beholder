@@ -53,7 +53,8 @@
 
                     (log/info "Indexing executed with result:" report))
                   (catch Exception e
-                    (log/error "There was an error while indexing K8S services" e)))))))
+                    (log/error "There was an error while indexing K8S services" e)
+                    (throw e)))))))
 
 (defn get-k8s-service! [id]
   (es/get-k8s-service! id))
