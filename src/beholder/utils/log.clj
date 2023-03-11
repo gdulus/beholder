@@ -1,8 +1,9 @@
 (ns beholder.utils.log
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [beholder.utils.date :as date]))
 
 (defn- log [level msg & other]
-  (println (str "[" level "]" msg " " (s/join " " other))))
+  (println (str "[" level "][" (date/now) "]:"  msg " " (s/join " " other))))
 
 (defn info [msg & other]
   (log "INFO" msg other))
