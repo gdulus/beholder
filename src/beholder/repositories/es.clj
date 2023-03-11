@@ -1,12 +1,12 @@
 (ns beholder.repositories.es
   (:require [beholder.model :as m]
-            [clojure.instant :as instant]
             [clojure.string :as str]
             [environ.core :refer [env]]
+            [beholder.utils.date :as date]
             [qbits.spandex :as e]
             [schema.core :as s]
             [beholder.utils.log :as log])
-  (:import (beholder.model BeholderConfig K8SService K8SServiceConfig ServiceDocumentation)))
+  (:import (beholder.model BeholderConfig K8SService K8SServiceConfig ServiceDocumentation AsyncJobRun)))
 
 (defn config []
   (log/spy :info
@@ -69,6 +69,24 @@
       [])))
 
 ; ----------------------------------------------------------------
+; AsyncJobRun
+; ----------------------------------------------------------------
+
+(defn- doc->AsyncJobRun [doc]
+  (->> (date/convert-map-field :lastRun doc)
+       (m/map->AsyncJobRun)))
+
+(defn get-async-job-run! [name]
+  (get [:async-job-run :_doc name]
+       AsyncJobRun
+       doc->AsyncJobRun))
+
+(defn save-async-job-run! [async-job-run]
+  (save [:async-job-run :_doc (:name async-job-run)]
+        AsyncJobRun
+        async-job-run))
+
+; ----------------------------------------------------------------
 ; BeholderConfig
 ; ----------------------------------------------------------------
 
@@ -92,14 +110,11 @@
 ; ----------------------------------------------------------------
 
 (defn- doc->K8SService [doc]
-  (->> (:lastUpdated doc)
-       (instant/read-instant-date)
-       (assoc doc :lastUpdated)
+  (->> (date/convert-map-field :lastUpdated doc)
        (m/map->K8SService)))
 
 (defn save-k8s-service! [config]
-  (let [now (java.util.Date.)
-        config (assoc config :lastUpdated now)]
+  (let [config (assoc config :lastUpdated (date/now))]
     (save [:k8s-services :_doc (:id config)]
           K8SService
           config)))

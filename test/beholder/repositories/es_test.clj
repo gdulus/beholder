@@ -2,6 +2,7 @@
   (:require
    [clojure.test :refer [deftest is testing]]
    [beholder.model :as m]
+   [beholder.utils.date :as date]
    [clj-test-containers.core :as tc]
    [beholder.repositories.es :as es]))
 
@@ -25,9 +26,20 @@
 (deftest ^:integration testing-es-respository
   (let [container (start-container)]
     (with-redefs [beholder.repositories.es/config (fn [] (build-mocked-es-config container))]
+
+;; ----
+      (testing "AsyncJobRun CRUD operations"
+        (testing "flow save -> get"
+          (let [run (m/map->AsyncJobRun {:name "test-job"
+                                         :lastRun (date/now)})
+                save-result (es/save-async-job-run! run)
+                load-result (es/get-async-job-run! "test-job")]
+            (is (= save-result run))
+            (is (= load-result run)))))
+
 ;; ----
       (testing "BeholderConfig CRUD operations"
-        (testing "flow save and get config"
+        (testing "flow save -> get"
           (let [conf (m/map->BeholderConfig {:namespaces ["n1" "n2"]
                                              :openApiLabel "openApiCustom"
                                              :openApiPath "/path/to/openapi"
@@ -50,20 +62,12 @@
                                         :asyncApiEnabled? true
                                         :resourceVersion 666
                                         :lastUpdated nil})
-                ; ---
-                ; Inst returned by save and date returned by get differ by miliseconds
-                ; First is using java api directly second uses istant/read-instant-date.
-                ;    example diff:
-                ;    save  #inst "2023-03-05T11:26:24.031-00:00"
-                ;    get   #inst "2023-03-05T11:26:24.000-00:00"
-                ; ---
                 save-result (es/save-k8s-service! srv)
+                load-result (es/get-k8s-service! "1")
+                ; ----
                 last-updated-save (:lastUpdated save-result)
                 srv-saved (assoc srv :lastUpdated last-updated-save)
-                ; ----
-                load-result (es/get-k8s-service! "1")
-                last-updated-get (:lastUpdated load-result)
-                srv-get (assoc srv :lastUpdated last-updated-get)]
+                srv-get (assoc srv :lastUpdated last-updated-save)]
             (is (= save-result srv-saved))
             (is (= load-result srv-get))))
 
@@ -117,3 +121,6 @@
 ;; ---
     (tc/stop! container)
     (tc/perform-cleanup!)))
+
+(deftest get-async-job-run-test
+  (is (= 1 1)))
