@@ -2,11 +2,9 @@
   (:require
    [beholder.repositories.es :as es]
    [beholder.repositories.k8s :as k8s]
-   [chime.core :refer [chime-at periodic-seq]]
-   [clojure.data :as data]
-   [beholder.utils.log :as log])
-  (:import
-   (java.time Duration Instant)))
+   [beholder.services.async-job :as async]
+   [beholder.utils.log :as log]
+   [clojure.data :as data]))
 
 (defn- find-removed [srv-local srv-cluster]
   (let [lcl (map :id srv-local)
@@ -37,24 +35,18 @@
 
 ; ---------------------------------------------------------
 
-(defn start-periodic-indexing! []
-  (let [now (Instant/now)
-        period (Duration/ofSeconds 60)
-        new-binding period]
-    (log/info "Setting up indexer. First execution will happen on " now " and will repeat every " new-binding)
-    (chime-at (periodic-seq now new-binding)
-              (fn [_]
-                (log/info "Executing K8S service indexing")
-                (try
-                  (let [report (index-k8s-services {:cluster-k8s-srv-provider-fn k8s/fetch-services!
-                                                    :local-k8s-srv-provider-fn es/list-k8s-service!
-                                                    :changed-k8s-srv-fn es/save-k8s-service!
-                                                    :removed-k8s-srv-fn es/delete-k8s-service!})]
+(def ^:private ^:const indexer-job-name "k8s-service-indexer-job")
+(def ^:private ^:const indexer-job-interval-sec (* 60 5))
 
-                    (log/info "Indexing executed with result:" report))
-                  (catch Exception e
-                    (log/error "There was an error while indexing K8S services" e)
-                    (throw e)))))))
+(defn start-periodic-indexing! []
+  (async/start-job indexer-job-name
+                   indexer-job-interval-sec
+                   (fn [_]
+                     (let [report (index-k8s-services {:cluster-k8s-srv-provider-fn k8s/fetch-services!
+                                                       :local-k8s-srv-provider-fn es/list-k8s-service!
+                                                       :changed-k8s-srv-fn es/save-k8s-service!
+                                                       :removed-k8s-srv-fn es/delete-k8s-service!})]
+                       (log/info "Indexing executed with result:" report)))))
 
 (defn get-k8s-service! [id]
   (es/get-k8s-service! id))
