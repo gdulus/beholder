@@ -56,10 +56,10 @@
 (defn delete [index id]
   (e/request @c {:method :delete :url [index :_doc id]}))
 
-(defn list [index model-class ->model-record]
+(defn list [index model-class ->model-record & {:keys [body]                                                :or {body nil}}]
   (try
     (as->
-     (e/request @c {:url [index :_search]}) v
+     (e/request @c {:url [index :_search] :body body}) v
       (get-in v [:body :hits :hits])
       (map :_source v)
       (map ->model-record v)
@@ -124,8 +124,11 @@
        K8SService
        doc->K8SService))
 
-(defn list-k8s-service! []
-  (list :k8s-services K8SService doc->K8SService))
+(defn list-k8s-service! [& {:keys [last-updated]}]
+  (list :k8s-services
+        K8SService
+        doc->K8SService
+        :body {:query {:range {:lastUpdated {:gte last-updated}}}}))
 
 (defn delete-k8s-service! [id]
   (delete :k8s-services id))

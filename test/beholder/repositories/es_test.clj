@@ -116,7 +116,28 @@
                 _ (sleep)
                 afetr-delete (es/get-k8s-service! "4")]
             (is (not (nil? before-delete)))
-            (is (nil? afetr-delete))))))
+            (is (nil? afetr-delete))))
+
+        (testing "flow save -> list & filter by last-update"
+          (let [srv (m/map->K8SService {:id "5"
+                                        :name "test service a"
+                                        :namespace "default"
+                                        :url "http://example.org"
+                                        :labels {:a "1" :b "2"}
+                                        :openApiEnabled? true
+                                        :asyncApiEnabled? true
+                                        :resourceVersion 666
+                                        :lastUpdated nil})
+                _ (es/save-k8s-service! srv)
+                _ (sleep)
+                result-now (es/list-k8s-service! :last-updated (date/now))
+                result-just (es/list-k8s-service! :last-updated (date/now -2))
+                result-just-ids (map :id result-just)
+                result-all (es/list-k8s-service! :last-updated (date/unix-date))
+                result-all-ids (map :id result-all)]
+            (is (= [] result-now))
+            (is (= ["5"] result-just-ids))
+            (is (= ["1" "2" "3" "5"] result-all-ids))))))
 
 ;; ---
     (tc/stop! container)
