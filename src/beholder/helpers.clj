@@ -1,6 +1,7 @@
 (ns beholder.helpers
-  (:require [clj-http.client :as client]
-            [beholder.utils.log :as log]))
+  (:require
+   [beholder.utils.log :as log]
+   [clj-http.client :as client]))
 
 (defn remote-resource-exists? [url]
   (try
