@@ -1,11 +1,11 @@
 (ns beholder.services.async-job-test
   (:require
+   [beholder.model :as m]
    [beholder.repositories.es :as es]
    [beholder.services.async-job :as sut]
-   [chime.core :as chime]
-   [clojure.test :refer [deftest is testing]]
    [beholder.utils.date :as date]
-   [beholder.model :as m]))
+   [chime.core :as chime]
+   [clojure.test :refer [deftest is testing]]))
 
 (deftest start-job-test
 
@@ -23,14 +23,14 @@
   (testing "starting job first time"
     (let [job-name "test-job"
           interval 100
-          now (date/now)
+          start-date (date/unix-date)
           saved-job-run nil]
       (with-redefs [beholder.repositories.es/get-async-job-run! (fn [_] saved-job-run)
                     beholder.repositories.es/save-async-job-run! identity
                     chime/chime-at (fn [_ f] (f nil))]
         (let [assert-fn (fn [r]
                           (is (= job-name (:name r)))
-                          (is (date/<=+ now (:lastRun r))))
+                          (is (date/<=+ start-date (:lastRun r))))
               result (sut/start-job job-name interval assert-fn)]
           (assert-fn result)))))
 
@@ -38,7 +38,7 @@
     (let [job-name "test-job"
           interval 10
           now (date/now)
-          past (.setTime now (- (.getTime now) 10000))
+          past (date/now -10000)
           saved-job-run (m/map->AsyncJobRun {:name "test-job" :lastRun past})]
       (with-redefs [beholder.repositories.es/get-async-job-run! (fn [_] saved-job-run)
                     beholder.repositories.es/save-async-job-run! identity
