@@ -16,18 +16,8 @@
 (def ^:private c (delay (e/client (config))))
 
 ; ----------------------------------------------------------------
-; Indexes
+; Basic CRUD operations
 ; ----------------------------------------------------------------
-
-(defn delete-indexes! []
-  (e/request @c {:method :delete :url [:beholder-config]})
-  (e/request @c {:method :delete :url [:k8s-services]})
-  (e/request @c {:method :delete :url [:services-documentation]}))
-
-(defn create-indexes! []
-  (e/request @c {:method :put :url [:beholder-config]})
-  (e/request @c {:method :put :url [:k8s-services]})
-  (e/request @c {:method :put :url [:services-documentation]}))
 
 (defn- get-by-id [url]
   (try
@@ -37,10 +27,6 @@
       (if (= (:status (ex-data e)) 404)
         nil
         (throw e)))))
-
-; ----------------------------------------------------------------
-; Basic CRUD operations
-; ----------------------------------------------------------------
 
 (defn save [url model-class model-data]
   (->>
@@ -56,7 +42,8 @@
 (defn delete [index id]
   (e/request @c {:method :delete :url [index :_doc id]}))
 
-(defn list [index model-class ->model-record & {:keys [body]                                                :or {body nil}}]
+(defn list [index model-class ->model-record & {:keys [body]                                                
+                                                :or   {body nil}}]
   (try
     (as->
      (e/request @c {:url [index :_search] :body body}) v
@@ -137,17 +124,23 @@
 ; ServiceConfig
 ; ----------------------------------------------------------------
 
-(defn save-service-config! [id config]
+(defn save-k8s-service-config! [config]
   (save [:services-config :_doc (:serviceId config)]
         K8SServiceConfig
         config))
 
-(defn get-service-config! [id]
+(defn get-k8s-service-config! [id]
   (get [:services-config :_doc id]
        K8SServiceConfig
        m/map->K8SServiceConfig))
 
-(defn list-service-configs! []
+(defn find-k8s-service-configs! [& {:keys [ids]}]
+  (list :services-config
+        K8SServiceConfig
+        m/map->K8SServiceConfig
+        :body {:query {:terms {:serviceId ids}}}))
+
+(defn list-k8s-service-configs! []
   (list :services-config K8SServiceConfig m/map->K8SServiceConfig))
 
 ; ----------------------------------------------------------------

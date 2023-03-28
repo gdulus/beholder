@@ -59,15 +59,12 @@
 ; K8SService
 ; --------------------------------------------------------------
 
-(s/defrecord K8SServiceConfig [openApiPath :- (s/maybe s/Str)
+(s/defrecord K8SServiceConfig [serviceId  :- s/Str
+                               openApiPath :- (s/maybe s/Str)
                                asyncApiPath :- (s/maybe s/Str)
                                team :- (s/maybe s/Str)
                                repo :- (s/maybe s/Str)
-                               description :- (s/maybe s/Str)
-                               openApiCached? :- (s/maybe s/Bool)
-                               openApiVersion :- (s/maybe s/Str)
-                               asyncApiCached? :- (s/maybe s/Bool)
-                               asyncApiVersion :- (s/maybe s/Str)])
+                               description :- (s/maybe s/Str)])
 
 (s/defrecord K8SServiceDocumentation [serviceId :- s/Str
                                       serviceVersion :- s/Int

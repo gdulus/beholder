@@ -9,7 +9,7 @@
 
 (defn- get-service-configs-map []
   (->>
-    (es/list-service-configs!)
+    (es/list-k8s-service-configs!)
     (map convert-to-key-value)
     (into {})))
 

@@ -1,4 +1,4 @@
-(ns beholder.repositories.asyncapi
+(ns beholder.repositories.doc
   (:require [beholder.model :as m]
             [clj-http.client :as client]
             [clojure.data.json :as json]
@@ -25,7 +25,7 @@
 
 ; -----------------------------------------------------------------
 
-(defn get-index-file [src]
+(defn fetch-openapi-doc [src]
   (let [{id "id" version "version"} (create-documentation src)]
     (as-> (get-file id version "/index.html") v
       (get v "body")

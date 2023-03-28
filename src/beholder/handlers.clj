@@ -17,7 +17,7 @@
 ;; Indexers
 ;; ------------------------------------------------------------
 
-;; (k8s/start-periodic-indexing!)
+;(k8s/start-periodic-indexing!)
 
 ;; ------------------------------------------------------------
 ;; Routes
@@ -66,7 +66,7 @@
   (context "/service/:id" [id]
     (GET "/config" [status]
       (let [beholder-conf       (es/get-beholder-config!)
-            service-conf        (es/get-service-config! id)
+            service-conf        (es/get-k8s-service-config! id)
             k8s-service         (k8s/get-k8s-service! id)
                                         ; ----------
             openapi-url         (m/get-openapi-url beholder-conf k8s-service service-conf)
@@ -97,7 +97,7 @@
                                  :team         team
                                  :repo         repo
                                  :description  description}) v
-        (es/save-service-config! 1 v)
+        (es/save-k8s-service-config! v)
         (str "/service/" id "/config?status=success")
         (moved-permanently v))))
 
@@ -111,7 +111,7 @@
 
     (GET "/proxy" []
       (let [beholder-conf (es/get-beholder-config!)
-            service-conf  (es/get-service-config! id)
+            service-conf  (es/get-k8s-service-config! id)
             k8s-service   (k8s/get-k8s-service! id)
             api-doc-url   (m/get-openapi-url beholder-conf k8s-service service-conf)]
         (log/info "Requesting OpenAPI doc from" api-doc-url)

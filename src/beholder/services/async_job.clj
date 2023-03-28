@@ -24,3 +24,6 @@
                           (es/save-async-job-run! current-job-run))
                         (catch Throwable e
                           (log/error (str "There was an error while running job " name) e)))))))
+
+
+
