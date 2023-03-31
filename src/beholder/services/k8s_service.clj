@@ -36,7 +36,7 @@
 ; ---------------------------------------------------------
 
 (def ^:private ^:const indexer-job-name "k8s-service-indexer-job")
-(def ^:private ^:const indexer-job-interval-sec (* 60 5))
+(def ^:private ^:const indexer-job-interval-sec 60)
 
 (defn start-periodic-indexing! []
   (async/start-job indexer-job-name

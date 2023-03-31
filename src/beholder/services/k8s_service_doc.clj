@@ -6,9 +6,6 @@
    [beholder.utils.log :as log]
    [beholder.repositories.es :as es]))
 
-(def ^:private ^:const indexer-job-name "documentation-indexer-job")
-(def ^:private ^:const indexer-job-interval-sec (* 60 1))
-
 (defn- find-k8s-conf [k8s-srv-confs k8s-srv]
   (let [id (:id k8s-srv)]
     (first (filter #(= id (:serviceId %)) k8s-srv-confs))))
@@ -23,13 +20,14 @@
                            :openApiDoc  @openapi-doc})))
 
 (defn- execute-indexing [since ctx]
-  (let [get-asyncapi-fn             (:get-asyncapi-fn ctx)
+  (let [;; unpack dependent functions
+        get-asyncapi-fn             (:get-asyncapi-fn ctx)
         get-openapi-fn              (:get-openapi-fn ctx)
         beholder-config-provider-fn (:beholder-config-provider-fn ctx)
         srv-provider-fn             (:srv-provider-fn ctx)
         srv-configs-provider-fn     (:srv-configs-provider-fn ctx)
         changed-k8s-srv-doc-fn      (:changed-k8s-srv-doc-fn ctx)
-        ; ----------------------------------
+        ;; get the data
         beholder-conf               (beholder-config-provider-fn)
         update-services             (srv-provider-fn :last-updated since)
         updated-services-ids        (map :id update-services)
@@ -39,10 +37,14 @@
      update-services
      (map #(vector beholder-conf % (find-k8s-conf srv-confs %) get-asyncapi-fn get-openapi-fn))
      (map #(apply build-K8SServiceDoc %))
-     (map changed-k8s-srv-doc-fn)))
-  )
+     (map changed-k8s-srv-doc-fn))))
 
-(defn start-indexing []
+; ----------------------------------
+
+(def ^:private ^:const indexer-job-name "k8s-service-doc-indexer-job")
+(def ^:private ^:const indexer-job-interval-sec 60)
+
+(defn start-periodic-indexing! []
   (async/start-job indexer-job-name
                    indexer-job-interval-sec
                    (fn [last-run]

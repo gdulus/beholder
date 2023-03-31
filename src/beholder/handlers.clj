@@ -5,7 +5,8 @@
    [beholder.model :as m]
    [beholder.repositories.es :as es]
    [beholder.services.carrier :as carrier]
-   [beholder.services.k8s-service :as k8s]
+   [beholder.services.k8s-service :as k8s-service]
+   [beholder.services.k8s-service-doc :as k8s-service-doc]
    [beholder.template :as tmpl]
    [beholder.utils.log :as log]
    [clojure.string :refer [replace split]]
@@ -17,7 +18,8 @@
 ;; Indexers
 ;; ------------------------------------------------------------
 
-;(k8s/start-periodic-indexing!)
+;(k8s-service/start-periodic-indexing!)
+;;(k8s-service-doc/start-periodic-indexing!)
 
 ;; ------------------------------------------------------------
 ;; Routes
