@@ -27,7 +27,9 @@
                   :get-asyncapi-fn             (fn [_] "AsyncApi Doc")
                   :get-openapi-fn              (fn [_] "OpeApi Doc")
                   :srv-provider-fn             (fn [& {:keys [_]}] 
-                                                 [(m/map->K8SService {:id "1"})])
+                                                 [(m/map->K8SService {:id "1"
+                                                                      :openApiEnabled? true
+                                                                      :asyncApiEnabled? true})])
                   :srv-configs-provider-fn     (fn [& {:keys [_]}] 
                                                  [(m/map->K8SServiceConfig {:serviceId "1"})])
                   :changed-k8s-srv-doc-fn      identity}
@@ -50,9 +52,13 @@
                                                               url))
                   :srv-provider-fn             (fn [& {:keys [_]}]
                                                  [(m/map->K8SService {:id  "1"
-                                                                      :url "http://s1.example.org"})
-                                                  (m/map->K8SService {:id  "2"
-                                                                      :url "http://s2.example.org"})])
+                                                                      :url "http://s1.example.org"
+                                                                      :openApiEnabled? true
+                                                                      :asyncApiEnabled? true})
+                                                  (m/map->K8SService {:id               "2"
+                                                                      :url              "http://s2.example.org"
+                                                                      :openApiEnabled?  true
+                                                                      :asyncApiEnabled? true})])
                   :srv-configs-provider-fn     (fn [& {:keys [_]}]
                                                  [(m/map->K8SServiceConfig {:serviceId    "1"
                                                                             :openApiPath  "/s1/openapi"
@@ -71,5 +77,43 @@
              (first result)))
       (is (= (m/map->K8SServiceDoc {:serviceId   "2"
                                     :openApiDoc  "OpeApi Doc S2"
+                                    :asyncApiDoc "AsyncApi Doc S2"})
+             (last result)))))
+  (testing "Two Service found but each one with diffrent type of documentation"
+    (let [;; with
+          ctx    {:beholder-config-provider-fn (fn [] (m/map->BeholderConfig {}))
+                  :get-asyncapi-fn             (fn [url] (get {"http://s1.example.org/s1/asyncapi" "AsyncApi Doc S1"
+                                                               "http://s2.example.org/s2/asyncapi" "AsyncApi Doc S2"}
+                                                              url))
+                  :get-openapi-fn              (fn [url] (get {"http://s1.example.org/s1/openapi" "OpeApi Doc S1"
+                                                               "http://s2.example.org/s2/openapi" "OpeApi Doc S2"}
+                                                              url))
+                  :srv-provider-fn             (fn [& {:keys [_]}]
+                                                 [(m/map->K8SService {:id  "1"
+                                                                      :url "http://s1.example.org"
+                                                                      :openApiEnabled? true
+                                                                      :asyncApiEnabled? false})
+                                                  (m/map->K8SService {:id               "2"
+                                                                      :url              "http://s2.example.org"
+                                                                      :openApiEnabled?  false
+                                                                      :asyncApiEnabled? true})])
+                  :srv-configs-provider-fn     (fn [& {:keys [_]}]
+                                                 [(m/map->K8SServiceConfig {:serviceId    "1"
+                                                                            :openApiPath  "/s1/openapi"
+                                                                            :asyncApiPath "/s1/asyncapi"})
+                                                  (m/map->K8SServiceConfig {:serviceId    "2"
+                                                                            :openApiPath  "/s2/openapi"
+                                                                            :asyncApiPath "/s2/asyncapi"})])
+                  :changed-k8s-srv-doc-fn      identity}
+          ;; when
+          result (#'beholder.services.k8s-service-doc/execute-indexing (d/unix-date) ctx)]
+      ;; then
+      (is (= 2 (count result)))
+      (is (= (m/map->K8SServiceDoc {:serviceId   "1"
+                                    :openApiDoc  "OpeApi Doc S1"
+                                    :asyncApiDoc nil})
+             (first result)))
+      (is (= (m/map->K8SServiceDoc {:serviceId   "2"
+                                    :openApiDoc  nil
                                     :asyncApiDoc "AsyncApi Doc S2"})
              (last result))))))

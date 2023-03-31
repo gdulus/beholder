@@ -38,16 +38,16 @@
 
 (defn- response->K8SService [list-resource openapi-label asyncapi-label]
   (let [labels (get-in list-resource [:metadata :labels])]
-    (m/->K8SService
-     (get-in list-resource [:metadata :uid])
-     (get-in list-resource [:metadata :name])
-     (get-in list-resource [:metadata :namespace])
-     (build-url list-resource)
-     labels
-     (contains? labels openapi-label)
-     (contains? labels asyncapi-label)
-     (Integer/parseInt (get-in list-resource [:metadata :resourceVersion]))
-     nil)))
+    (m/map->K8SService {
+                        :id               (get-in list-resource [:metadata :uid])
+                        :name             (get-in list-resource [:metadata :name])
+                        :namespace        (get-in list-resource [:metadata :namespace])
+                        :url              (build-url list-resource)
+                        :labels           labels
+                        :openApiEnabled?  (contains? labels openapi-label)
+                        :asyncApiEnabled? (contains? labels asyncapi-label)
+                        :resourceVersion  (Integer/parseInt (get-in list-resource [:metadata :resourceVersion]))
+                        :lastUpdated      nil})))
 
 (defn- validate-K8SService [service]
   (s/validate K8SService service))

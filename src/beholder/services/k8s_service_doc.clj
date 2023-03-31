@@ -6,6 +6,8 @@
    [beholder.utils.log :as log]
    [beholder.repositories.es :as es]))
 
+(def ^:private empty-ref (ref nil))
+
 (defn- find-k8s-conf [k8s-srv-confs k8s-srv]
   (let [id (:id k8s-srv)]
     (first (filter #(= id (:serviceId %)) k8s-srv-confs))))
@@ -13,8 +15,12 @@
 (defn- build-K8SServiceDoc [beholder-conf k8s-srv k8s-srv-conf get-asyncapi-fn get-openapi-fn]
   (let [openapi-url  (m/get-openapi-url beholder-conf k8s-srv k8s-srv-conf)
         asyncapi-url (m/get-asyncapi-url beholder-conf k8s-srv k8s-srv-conf)
-        asyncapi-doc (future (get-asyncapi-fn asyncapi-url))
-        openapi-doc  (future (get-openapi-fn openapi-url))]
+        asyncapi-doc (if (:asyncApiEnabled? k8s-srv) 
+                       (future (get-asyncapi-fn asyncapi-url)) 
+                       empty-ref)
+        openapi-doc  (if (:openApiEnabled? k8s-srv) 
+                       (future (get-openapi-fn openapi-url))
+                       empty-ref)]
     (m/map->K8SServiceDoc {:serviceId   (:id k8s-srv)
                            :asyncApiDoc @asyncapi-doc
                            :openApiDoc  @openapi-doc})))
