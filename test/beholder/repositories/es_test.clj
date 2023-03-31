@@ -20,15 +20,18 @@
 (defn build-mocked-es-config [container]
   {:hosts [(str "http://" (:host container) ":" (get (:mapped-ports container) 9200))]})
 
-(defn sleep []
-  (Thread/sleep 1000))
+(defn sleep 
+  ([]
+   (sleep 1))
+  ([sec]
+   (Thread/sleep (* sec 1000))))
 
 (deftest ^:integration testing-es-respository
   (let [container (start-container)]
     (with-redefs [beholder.repositories.es/config (fn [] (build-mocked-es-config container))]
 
 ; ------------------------------------------
-
+      
       (testing "AsyncJobRun CRUD operations"
         (testing "flow save -> get"
           (let [run         (m/map->AsyncJobRun {:name    "test-job"
@@ -39,7 +42,7 @@
             (is (= load-result run)))))
 
 ; ------------------------------------------
-
+      
       (testing "BeholderConfig CRUD operations"
         (testing "flow save -> get"
           (let [conf        (m/map->BeholderConfig {:namespaces    ["n1" "n2"]
@@ -51,9 +54,9 @@
                 load-result (es/get-beholder-config!)]
             (is (= save-result conf))
             (is (= load-result conf)))))
-
-; ------------------------------------------      
-
+      
+      ; ------------------------------------------      
+      
       (testing "K8SServiceConfig CRUD operations"
         (testing "flow save -> get"
           (let [conf        (m/map->K8SServiceConfig {:serviceId    "1"
@@ -61,9 +64,8 @@
                                                       :asyncApiPath "/path/to/asyncapi"
                                                       :team         "team name"
                                                       :repo         "repo name"
-                                                      :description  "desc"
-                                                      })
-                save-result (es/save-k8s-service-config! conf) 
+                                                      :description  "desc"})
+                save-result (es/save-k8s-service-config! conf)
                 load-result (es/get-k8s-service-config! "1")]
             (is (= conf save-result))
             (is (= conf load-result))))
@@ -74,8 +76,8 @@
                                                       :team         "team name"
                                                       :repo         "repo name"
                                                       :description  "desc"})
-                _ (es/save-k8s-service-config! conf)
-                _ (sleep)
+                _           (es/save-k8s-service-config! conf)
+                _           (sleep)
                 list-result (es/list-k8s-service-configs!)]
             (is (= 2 (count list-result)))))
         (testing "flow save -> find"
@@ -85,13 +87,13 @@
                                                       :team         "team name"
                                                       :repo         "repo name"
                                                       :description  "desc"})
-                _ (es/save-k8s-service-config! conf)
-                _ (sleep)
+                _           (es/save-k8s-service-config! conf)
+                _           (sleep)
                 find-result (es/find-k8s-service-configs! :ids ["1" "3"])]
             (is (= 2 (count find-result))))))
 
 ; ------------------------------------------
-
+      
       (testing "K8SService CRUD operations"
         (testing "flow save -> get"
           (let [srv               (m/map->K8SService {:id               "1"
@@ -173,9 +175,10 @@
                                                     :openApiEnabled?  true
                                                     :asyncApiEnabled? true
                                                     :resourceVersion  666
-                                                    :lastUpdated      nil})
+                                                    :lastUpdated      nil}) 
+                _               (sleep 2)
                 _               (es/save-k8s-service! srv)
-                _               (sleep)
+                _               (sleep) 
                 result-now      (es/list-k8s-service! :last-updated (date/now))
                 result-just     (es/list-k8s-service! :last-updated (date/now -2))
                 result-just-ids (map :id result-just)

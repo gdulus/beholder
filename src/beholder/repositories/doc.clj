@@ -1,22 +1,19 @@
 (ns beholder.repositories.doc
-  (:require [beholder.model :as m]
-            [clj-http.client :as client]
+  (:require [clj-http.client :as client]
             [clojure.data.json :as json]
             [environ.core :refer [env]]
-            [schema.core :as s]
-            [beholder.utils.log :as log])
-  (:import (beholder.model AsyncApiDocumentation)))
+            [beholder.utils.log :as log]))
 
 (def ^:private url (env :asyncapi-generator-service))
 
-(defn- create-documentation [src]
+(defn- create-asyncapi-doc [src]
   (->> (str url "/asyncapi?src=" src)
        (log/spy :info)
        (client/post)
        (:body)
        (json/read-str)))
 
-(defn- get-file [id version file]
+(defn- get-asyncapi-doc [id version file]
   (->> (str url "/asyncapi/file?id=" id "&version=" version "&file=" file)
        (log/spy :info)
        (client/get)
@@ -25,10 +22,10 @@
 
 ; -----------------------------------------------------------------
 
-(defn fetch-openapi-doc [src]
-  (let [{id "id" version "version"} (create-documentation src)]
-    (as-> (get-file id version "/index.html") v
-      (get v "body")
-      {:version version :body v}
-      (m/map->AsyncApiDocumentation v)
-      (s/validate AsyncApiDocumentation v))))
+(defn fetch-asyncapi-doc! [src]
+  (let [{id      "id"
+         version "version"} (create-asyncapi-doc src)]
+    (get-asyncapi-doc id version "/index.html")))
+
+(defn fetch-openapi-doc! [src]
+  (client/get src))

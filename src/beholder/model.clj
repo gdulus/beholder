@@ -59,18 +59,6 @@
 ; K8SService
 ; --------------------------------------------------------------
 
-(s/defrecord K8SServiceConfig [serviceId  :- s/Str
-                               openApiPath :- (s/maybe s/Str)
-                               asyncApiPath :- (s/maybe s/Str)
-                               team :- (s/maybe s/Str)
-                               repo :- (s/maybe s/Str)
-                               description :- (s/maybe s/Str)])
-
-(s/defrecord K8SServiceDocumentation [serviceId :- s/Str
-                                      serviceVersion :- s/Int
-                                      openApiDoc :- (s/maybe s/Str)
-                                      asyncApiDoc :- (s/maybe s/Str)])
-
 (s/defrecord K8SService [id :- s/Str
                          name :- s/Str
                          namespace :- s/Str
@@ -81,14 +69,16 @@
                          resourceVersion :- s/Int
                          lastUpdated :- (s/maybe timestamp)])
 
-; --------------------------------------------------------------
+(s/defrecord K8SServiceConfig [serviceId  :- s/Str
+                               openApiPath :- (s/maybe s/Str)
+                               asyncApiPath :- (s/maybe s/Str)
+                               team :- (s/maybe s/Str)
+                               repo :- (s/maybe s/Str)
+                               description :- (s/maybe s/Str)])
 
-(s/defrecord AsyncApiDocumentation [version :- s/Str
-                                    body :- s/Str])
-
-(s/defrecord ServiceDocumentation [serviceId :- s/Str
-                                   openApiDoc :- (s/maybe s/Str)
-                                   asyncApiDoc :- (s/maybe AsyncApiDocumentation)])
+(s/defrecord K8SServiceDoc [serviceId :- s/Str
+                            openApiDoc :- (s/maybe s/Str)
+                            asyncApiDoc :- (s/maybe s/Str)])
 
 ; --------------------------------------------------------------
 
@@ -101,12 +91,12 @@
 
 ; --------------------------------------------------------------
 
-(defn get-openapi-url [beholder-config k8s-service-conf service-conf]
-  (str (:url k8s-service-conf) "/" (if (not (str/blank? (:openApiPath service-conf)))
-                                     (sanitize-path (:openApiPath service-conf))
+(defn get-openapi-url [beholder-config k8s-service k8s-service-conf]
+  (str (:url k8s-service) "/" (if (not (str/blank? (:openApiPath k8s-service-conf)))
+                                     (sanitize-path (:openApiPath k8s-service-conf))
                                      (sanitize-path (get-openapi-path beholder-config)))))
 
-(defn get-asyncapi-url [beholder-config k8s-service-conf service-conf]
-  (str (:url k8s-service-conf) "/" (if (not (str/blank? (:asyncApiPath service-conf)))
-                                     (sanitize-path (:asyncApiPath service-conf))
+(defn get-asyncapi-url [beholder-config k8s-service k8s-service-conf]
+  (str (:url k8s-service) "/" (if (not (str/blank? (:asyncApiPath k8s-service-conf)))
+                                     (sanitize-path (:asyncApiPath k8s-service-conf))
                                      (sanitize-path (get-asyncapi-path beholder-config)))))

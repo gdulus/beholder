@@ -126,7 +126,7 @@
       (ok (tmpl/html "asyncapi-ui.html" {:id id})))
 
     (GET "/proxy" []
-      (if-let [service-doc (es/get-service-documentation! id)]
+      (if-let [service-doc (es/get-k8s-service-doc! id)]
         (->
          (get-in service-doc [:asyncApiDoc :body])
          (replace #"css/global.min.css" "/static/asyncapi/global.min.css")

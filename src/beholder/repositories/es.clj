@@ -6,7 +6,7 @@
             [qbits.spandex :as e]
             [schema.core :as s]
             [beholder.utils.log :as log])
-  (:import (beholder.model BeholderConfig K8SService K8SServiceConfig ServiceDocumentation AsyncJobRun)))
+  (:import (beholder.model BeholderConfig K8SService K8SServiceConfig K8SServiceDoc AsyncJobRun)))
 
 (defn config []
   (log/spy :info
@@ -125,34 +125,40 @@
 ; ----------------------------------------------------------------
 
 (defn save-k8s-service-config! [config]
-  (save [:services-config :_doc (:serviceId config)]
+  (save [:k8s-services-config :_doc (:serviceId config)]
         K8SServiceConfig
         config))
 
 (defn get-k8s-service-config! [id]
-  (get [:services-config :_doc id]
+  (get [:k8s-services-config :_doc id]
        K8SServiceConfig
        m/map->K8SServiceConfig))
 
 (defn find-k8s-service-configs! [& {:keys [ids]}]
-  (list :services-config
+  (list :k8s-services-config
         K8SServiceConfig
         m/map->K8SServiceConfig
         :body {:query {:terms {:serviceId ids}}}))
 
 (defn list-k8s-service-configs! []
-  (list :services-config K8SServiceConfig m/map->K8SServiceConfig))
+  (list :k8s-services-config K8SServiceConfig m/map->K8SServiceConfig))
 
 ; ----------------------------------------------------------------
-; ServiceDocumentation
+; K8SServiceDoc
 ; ----------------------------------------------------------------
 
-(defn get-service-documentation! [id]
-  (when-let [raw (not-empty (get-by-id [:services-documentation :_doc id]))]
-    (let [async-doc (m/map->AsyncApiDocumentation (:asyncApiDoc raw))]
-      (m/map->ServiceDocumentation (assoc raw :asyncApiDoc async-doc)))))
-
-(defn save-service-documentation! [^ServiceDocumentation doc]
-  (save [:services-documentation :_doc (:serviceId doc)]
-        ServiceDocumentation
+(defn save-k8s-service-doc! [doc]
+  (save [:k8s-services-doc :_doc (:serviceId doc)]
+        K8SServiceDoc
         doc))
+
+(defn get-k8s-service-doc! [id]
+  (get [:k8s-services-doc :_doc id]
+       K8SServiceDoc
+       m/map->K8SServiceDoc))
+
+(defn find-k8s-service-docs! [& {:keys [ids]}]
+  (list :k8s-services-doc
+        K8SServiceDoc
+        m/map->K8SServiceDoc
+        :body {:query {:terms {:serviceId ids}}}))

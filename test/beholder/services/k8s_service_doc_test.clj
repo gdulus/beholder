@@ -4,4 +4,6 @@
    [beholder.model :as m]
    [beholder.services.k8s-service :as subject]))
 
-
+(deftest name-test
+      (testing "Context of the test assertions"
+        (is (= assertion-values)))) 
