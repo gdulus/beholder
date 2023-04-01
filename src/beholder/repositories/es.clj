@@ -28,25 +28,26 @@
         nil
         (throw e)))))
 
-(defn save [url model-class model-data]
+(defn save-es-doc [url model-class model-data]
   (->>
    (s/validate model-class model-data)
    (assoc {:method :put :url url} :body)
    (e/request @c))
   model-data)
 
-(defn get [url model-class ->model-record]
+(defn get-es-doc [url model-class ->model-record]
   (when-let [conf (not-empty (get-by-id url))]
     (s/validate model-class (->model-record conf))))
 
-(defn delete [index id]
+(defn delete-es-doc [index id]
   (e/request @c {:method :delete :url [index :_doc id]}))
 
-(defn list [index model-class ->model-record & {:keys [body]                                                
-                                                :or   {body nil}}]
+(defn list-es-docs [index model-class ->model-record & {:keys [body]                                                
+                                                        :or   {body nil}}]
   (try
     (as->
-     (e/request @c {:url [index :_search] :body body}) v
+     (e/request @c {:url  [index :_search]
+                    :body body}) v
       (get-in v [:body :hits :hits])
       (map :_source v)
       (map ->model-record v)
@@ -64,12 +65,12 @@
        (m/map->AsyncJobRun)))
 
 (defn get-async-job-run! [name]
-  (get [:async-job-run :_doc name]
+  (get-es-doc [:async-job-run :_doc name]
        AsyncJobRun
        doc->AsyncJobRun))
 
 (defn save-async-job-run! [async-job-run]
-  (save [:async-job-run :_doc (:name async-job-run)]
+  (save-es-doc [:async-job-run :_doc (:name async-job-run)]
         AsyncJobRun
         async-job-run))
 
@@ -81,14 +82,14 @@
 
 ;; TODO update tests
 (defn get-beholder-config! []
-  (if-let [config (get [:beholder-config :_doc beholder-config-id]
+  (if-let [config (get-es-doc [:beholder-config :_doc beholder-config-id]
                        BeholderConfig
                        m/map->BeholderConfig)]
     config
     (m/map->BeholderConfig {:namespaces []})))
 
 (defn save-beholder-config! [config]
-  (save [:beholder-config :_doc beholder-config-id]
+  (save-es-doc [:beholder-config :_doc beholder-config-id]
         BeholderConfig
         config))
 
@@ -102,63 +103,58 @@
 
 (defn save-k8s-service! [config]
   (let [config (assoc config :lastUpdated (date/now))]
-    (save [:k8s-services :_doc (:id config)]
+    (save-es-doc [:k8s-services :_doc (:id config)]
           K8SService
           config)))
 
 (defn get-k8s-service! [id]
-  (get [:k8s-services :_doc id]
+  (get-es-doc [:k8s-services :_doc id]
        K8SService
        doc->K8SService))
 
 (defn list-k8s-service! [& {:keys [last-updated]}]
-  (list :k8s-services
+  (list-es-docs :k8s-services
         K8SService
         doc->K8SService
         :body {:query {:range {:lastUpdated {:gte last-updated}}}}))
 
 (defn delete-k8s-service! [id]
-  (delete :k8s-services id))
+  (delete-es-doc :k8s-services id))
 
 ; ----------------------------------------------------------------
-; ServiceConfig
+; K8SServiceConfig
 ; ----------------------------------------------------------------
 
 (defn save-k8s-service-config! [config]
-  (save [:k8s-services-config :_doc (:serviceId config)]
+  (save-es-doc [:k8s-services-config :_doc (:serviceId config)]
         K8SServiceConfig
         config))
 
 (defn get-k8s-service-config! [id]
-  (get [:k8s-services-config :_doc id]
+  (get-es-doc [:k8s-services-config :_doc id]
        K8SServiceConfig
        m/map->K8SServiceConfig))
 
 (defn find-k8s-service-configs! [& {:keys [ids]}]
-  (list :k8s-services-config
+  (list-es-docs :k8s-services-config
         K8SServiceConfig
         m/map->K8SServiceConfig
         :body {:query {:terms {:serviceId ids}}}))
 
 (defn list-k8s-service-configs! []
-  (list :k8s-services-config K8SServiceConfig m/map->K8SServiceConfig))
+  (list-es-docs :k8s-services-config K8SServiceConfig m/map->K8SServiceConfig))
 
 ; ----------------------------------------------------------------
 ; K8SServiceDoc
 ; ----------------------------------------------------------------
 
 (defn save-k8s-service-doc! [doc]
-  (save [:k8s-services-doc :_doc (:serviceId doc)]
+  (save-es-doc [:k8s-services-doc :_doc (:serviceId doc)]
         K8SServiceDoc
         doc))
 
 (defn get-k8s-service-doc! [id]
-  (get [:k8s-services-doc :_doc id]
+  (get-es-doc [:k8s-services-doc :_doc id]
        K8SServiceDoc
        m/map->K8SServiceDoc))
 
-(defn find-k8s-service-docs! [& {:keys [ids]}]
-  (list :k8s-services-doc
-        K8SServiceDoc
-        m/map->K8SServiceDoc
-        :body {:query {:terms {:serviceId ids}}}))
