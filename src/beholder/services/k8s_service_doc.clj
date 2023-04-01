@@ -64,4 +64,4 @@
                                              :changed-k8s-srv-doc-fn      es/save-k8s-service-doc!})
                           (doall)
                           (count)
-                          (log/spy :info "Doc indexing job finished. Number of indexed documents = ")))))
+                          (log/info "Doc indexing job finished. Number of indexed documents = ")))))

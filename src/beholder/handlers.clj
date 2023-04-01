@@ -19,7 +19,7 @@
 ;; ------------------------------------------------------------
 
 ;;(k8s-service/start-periodic-indexing!)
-(k8s-service-doc/start-periodic-indexing!)
+;;(k8s-service-doc/start-periodic-indexing!)
 
 ;; ------------------------------------------------------------
 ;; Routes
