@@ -53,5 +53,3 @@
 
 (defn list-k8s-service! []
   (es/list-k8s-service!))
-
-

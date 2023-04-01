@@ -51,7 +51,7 @@
       (map :_source v)
       (map ->model-record v)
       (map #(s/validate model-class %) v))
-    (catch Exception e
+    (catch Throwable e
       (log/error "There was an issue when listing resources" e)
       [])))
 

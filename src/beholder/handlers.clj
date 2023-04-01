@@ -5,7 +5,7 @@
    [beholder.model :as m]
    [beholder.repositories.es :as es]
    [beholder.services.carrier :as carrier]
-   [beholder.services.k8s-service :as k8s]
+   [beholder.services.k8s-service :as k8s-service]
    [beholder.services.k8s-service-doc :as k8s-service-doc]
    [beholder.template :as tmpl]
    [beholder.utils.log :as log]
@@ -18,8 +18,8 @@
 ;; Indexers
 ;; ------------------------------------------------------------
 
-;(k8s-service/start-periodic-indexing!)
-;;(k8s-service-doc/start-periodic-indexing!)
+;;(k8s-service/start-periodic-indexing!)
+(k8s-service-doc/start-periodic-indexing!)
 
 ;; ------------------------------------------------------------
 ;; Routes
@@ -69,7 +69,7 @@
     (GET "/config" [status]
       (let [beholder-conf       (es/get-beholder-config!)
             service-conf        (es/get-k8s-service-config! id)
-            k8s-service         (k8s/get-k8s-service! id)
+            k8s-service         (k8s-service/get-k8s-service! id)
                                         ; ----------
             openapi-url         (m/get-openapi-url beholder-conf k8s-service service-conf)
             openapi-label       (m/get-openapi-label beholder-conf)
@@ -114,7 +114,7 @@
     (GET "/proxy" []
       (let [beholder-conf (es/get-beholder-config!)
             service-conf  (es/get-k8s-service-config! id)
-            k8s-service   (k8s/get-k8s-service! id)
+            k8s-service   (k8s-service/get-k8s-service! id)
             api-doc-url   (m/get-openapi-url beholder-conf k8s-service service-conf)]
         (log/info "Requesting OpenAPI doc from" api-doc-url)
         (fetch-remote-resource api-doc-url))))
@@ -128,7 +128,7 @@
       (ok (tmpl/html "asyncapi-ui.html" {:id id})))
 
     (GET "/proxy" []
-      (if-let [service-doc (es/get-k8s-service-doc! id)]
+      (when-let [service-doc (es/get-k8s-service-doc! id)]
         (->
          (get-in service-doc [:asyncApiDoc :body])
          (replace #"css/global.min.css" "/static/asyncapi/global.min.css")

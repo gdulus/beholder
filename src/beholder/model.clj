@@ -1,5 +1,6 @@
 (ns beholder.model
   (:require [clojure.string :as str]
+            [environ.core :refer [env]]
             [schema.core :as s]))
 
 (def ^:private url (s/pred #(re-matches #"(www|http:|https:)+[^\s]+[\w]" %)))
@@ -92,9 +93,12 @@
 ; --------------------------------------------------------------
 
 (defn get-openapi-url [beholder-config k8s-service k8s-service-conf]
-  (str (:url k8s-service) "/" (if (not (str/blank? (:openApiPath k8s-service-conf)))
-                                     (sanitize-path (:openApiPath k8s-service-conf))
-                                     (sanitize-path (get-openapi-path beholder-config)))))
+  (let [app-name     (:name k8s-service)
+        override-url (env (keyword app-name))
+        url          (or override-url (:url k8s-service))]
+    (str url "/" (if (not (str/blank? (:openApiPath k8s-service-conf)))
+                   (sanitize-path (:openApiPath k8s-service-conf))
+                   (sanitize-path (get-openapi-path beholder-config))))))
 
 (defn get-asyncapi-url [beholder-config k8s-service k8s-service-conf]
   (str (:url k8s-service) "/" (if (not (str/blank? (:asyncApiPath k8s-service-conf)))

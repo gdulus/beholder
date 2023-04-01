@@ -31,10 +31,8 @@
 
 (defn- build-url [list-resource]
   (let [app-name (get-in list-resource [:spec :selector :app])
-        override (env (keyword app-name))
-        domain (or override app-name)
-        port (when-not override (str ":" (get-port list-resource)))]
-    (str "http://" domain port)))
+        port (get-port list-resource)]
+    (str "http://" app-name ":" port)))
 
 (defn- response->K8SService [list-resource openapi-label asyncapi-label]
   (let [labels (get-in list-resource [:metadata :labels])]

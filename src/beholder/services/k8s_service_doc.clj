@@ -13,6 +13,7 @@
     (first (filter #(= id (:serviceId %)) k8s-srv-confs))))
 
 (defn- build-K8SServiceDoc [beholder-conf k8s-srv k8s-srv-conf get-asyncapi-fn get-openapi-fn]
+  (log/info "Processing service" (:id k8s-srv))
   (let [openapi-url  (m/get-openapi-url beholder-conf k8s-srv k8s-srv-conf)
         asyncapi-url (m/get-asyncapi-url beholder-conf k8s-srv k8s-srv-conf)
         asyncapi-doc (if (:asyncApiEnabled? k8s-srv) 
@@ -53,11 +54,14 @@
 (defn start-periodic-indexing! []
   (async/start-job indexer-job-name
                    indexer-job-interval-sec
-                   (fn [last-run]
-                     (execute-indexing last-run
-                                       {:get-asyncapi-fn             doc/fetch-asyncapi-doc!
-                                        :get-openapi-fn              doc/fetch-openapi-doc!
-                                        :beholder-config-provider-fn es/get-beholder-config!
-                                        :srv-provider-fn             es/list-k8s-service!
-                                        :srv-configs-provider-fn     es/find-k8s-service-configs!
-                                        :changed-k8s-srv-doc-fn      es/save-k8s-service-doc!}))))
+                   (fn [job-run]
+                     (->> (execute-indexing (:lastRun job-run)
+                                            {:get-asyncapi-fn             doc/fetch-asyncapi-doc!
+                                             :get-openapi-fn              doc/fetch-openapi-doc!
+                                             :beholder-config-provider-fn es/get-beholder-config!
+                                             :srv-provider-fn             es/list-k8s-service!
+                                             :srv-configs-provider-fn     es/find-k8s-service-configs!
+                                             :changed-k8s-srv-doc-fn      es/save-k8s-service-doc!})
+                          (doall)
+                          (count)
+                          (log/spy :info "Doc indexing job finished. Number of indexed documents = ")))))
